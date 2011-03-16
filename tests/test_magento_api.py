@@ -17,12 +17,11 @@ from gluon.shell import env
 
 # pylint: disable=C0111,R0904
 
-# The tests require the local settings for the api user and password. Use
-# the firearms application.
+# The tests require the local settings for the api user and password. Define
+# them in the [shared] section of the private/etc/test.conf file.
 
-APPLICATION = 'firearms'
-
-APP_ENV = env(APPLICATION, import_models=True)
+APP_ENV = env(__file__.split('/')[-3], import_models=True)
+DBH = APP_ENV['db']
 LOCAL_SETTINGS = APP_ENV['local_settings']
 
 URL = "http://www.magento-dev.com"

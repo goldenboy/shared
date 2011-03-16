@@ -16,9 +16,7 @@ from gluon.shell import env
 import sys
 import unittest
 
-# The settings module can be used by multiple applications. The choice used
-# here is random.
-APP_ENV = env('igeejo', import_models=True)
+APP_ENV = env(__file__.split('/')[-3], import_models=True)
 DB = APP_ENV['db']
 
 # C0111: Missing docstring
@@ -55,7 +53,6 @@ class TestSetting(unittest.TestCase):
 
     def test__match(self):
         settings = Setting.match(DB, 'cfc_%', as_dict=True)
-        self.assertTrue('cfc_business_licence_no' in settings)
 
         name_1 = 'cfc_test__match_name_1_'
         value_1 = '_test__match_value_1_'

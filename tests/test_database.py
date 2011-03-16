@@ -8,7 +8,6 @@ Test suite for shared/modules/db/table.py
 """
 
 # The accounting database is use for testing
-from applications.accounting.modules.company import Company, Account
 from applications.shared.modules.local.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from gluon.validators import IS_DATE, IS_DATETIME, IS_INT_IN_RANGE, \
@@ -30,13 +29,11 @@ import unittest
 
 from gluon.shell import env
 
-# The test script requires an existing database to work with. The
-# database needs to be set up for web2py.  We'll use the accounting
-# database for lack of a better one.
+# The test script requires an existing database to work with. The shared
+# database should have tables account and company. The models/db.py should
+# define the tables.
 
-APPLICATION = 'accounting'
-
-APP_ENV = env(APPLICATION, import_models=True)
+APP_ENV = env(__file__.split('/')[-3], import_models=True)
 DBH = APP_ENV['db']
 
 D = decimal.Decimal
@@ -80,6 +77,30 @@ START_DATE_2 = datetime.date(2010, 2, 22)
 STATUS = 'a'
 STATUS_2 = 'd'
 LIST = ['abc', 'def', 'ghi']
+
+
+# The Account class is adapted from the accounting class of the same name.
+class Account(DbObject):
+
+    """Class representing an account record.
+
+    """
+
+    def __init__(self, tbl_, **kwargs):
+        super(Account, self).__init__(tbl_, **kwargs)
+        return
+
+
+# The Company class is adapted from the accounting class of the same name.
+class Company(DbObject):
+
+    """Class representing an accounting company record.
+
+    """
+
+    def __init__(self, tbl_, **kwargs):
+        super(Company, self).__init__(tbl_, **kwargs)
+        return
 
 
 def suite_setup():

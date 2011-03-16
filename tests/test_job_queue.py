@@ -23,13 +23,10 @@ from gluon.shell import env
 # R0904: *Too many public methods (%s/%s)*
 # pylint: disable=C0111,R0904
 
-# The test script requires an existing database to work with. The
-# database needs to be set up for web2py.  We'll use the igeejo
-# database for lack of a better one.
+# The test script requires an existing database to work with. The shared
+# database should have a job table. The models/db.py should define the table.
 
-APPLICATION = 'igeejo'
-
-APP_ENV = env(APPLICATION, import_models=True)
+APP_ENV = env(__file__.split('/')[-3], import_models=True)
 DBH = APP_ENV['db']
 
 TMP_DIR = '/tmp/test_suite/job_queue'

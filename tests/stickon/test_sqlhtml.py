@@ -22,12 +22,10 @@ import unittest
 # pylint: disable=C0103,C0111,R0904
 
 # The test script requires an existing database to work with. The
-# database needs to be set up for web2py.  We'll use the accounting
-# database for lack of a better one.
+# shared database should have tables account and company. The models/db.py
+# should define the tables.
 
-APPLICATION = 'accounting'
-
-APP_ENV = env(APPLICATION, import_models=True)
+APP_ENV = env(__file__.split('/')[-4], import_models=True)
 DBH = APP_ENV['db']
 
 

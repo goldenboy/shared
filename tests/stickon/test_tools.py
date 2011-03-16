@@ -21,8 +21,7 @@ import unittest
 # R0904: Too many public methods
 # pylint: disable=C0111,R0904
 
-
-APPLICATION = 'blog'
+APPLICATION = __file__.split('/')[-4]
 
 
 class TestModelDb(unittest.TestCase):
