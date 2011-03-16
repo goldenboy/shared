@@ -1,0 +1,13 @@
+[by_name]
+id = SKIP
+creation_date = writable=False
+modified_date = writable=False
+created_on = writable=False
+updated_on = writable=False
+status = requires=IS_IN_SET([('a', 'Enabled'), ('d', 'Disabled')], zero=None)
+
+[by_type]
+string = requires=IS_NOT_EMPTY()
+date = requires=IS_DATE()
+time = requires=IS_DATE()
+datetime = requires=IS_DATETIME()
