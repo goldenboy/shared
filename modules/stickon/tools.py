@@ -45,7 +45,7 @@ class ModelDb(object):
 
         auth = Auth(self.environment, self.db)  # authentication/authorization
         auth.settings.hmac_key = self.local_settings.hmac_key
-        auth.define_tables()  # creates all needed tables
+        auth.define_tables(fake_migrate=True)  # creates all needed tables
         self.settings_loader.import_settings(group='auth',
                 storage=auth.settings)
         auth.settings.mailer = self.mail
