@@ -71,7 +71,7 @@ except ImportError:
         import json
     except ImportError:
         try:
-            import simplejson as json
+            import gluon.contrib.simplejson as json
         except ImportError:
             raise ImportError(
                 'You must have the cjson, json, or simplejson ' +
