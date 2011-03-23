@@ -123,7 +123,7 @@ class WebPage(object):
         bs_re = \
             re.compile('class="script_loader"allowtransparency="true"')
         self.bs_massage.append((bs_re, lambda match: \
-                               'class="script_loader" allowtransparency="true"'))
+                    'class="script_loader" allowtransparency="true"'))
         # Remove troublesome sidebar
         #    eg <div id="tn15lhs">... </div><div id="tn15main">     =>
         #       </div><div id="tn15main">
@@ -196,6 +196,12 @@ class WebPage(object):
                            re.IGNORECASE)
         self.bs_massage.append((bs_re, lambda match: match.group(1) \
                                + '"' + match.group(2)))
+
+        # Rogue perl tag (imdb)  Newer versions of Beautiful Soup handle this
+        #   eg. <div class="inputs"></%perl></div>
+        #      <div class="inputs"></div>
+        bs_re = re.compile(r'</%perl>')
+        self.bs_massage.append((bs_re, lambda match: ''))
         return
 
     def as_soup(self):
