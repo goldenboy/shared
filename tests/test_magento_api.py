@@ -24,7 +24,7 @@ APP_ENV = env(__file__.split('/')[-3], import_models=True)
 DBH = APP_ENV['db']
 LOCAL_SETTINGS = APP_ENV['local_settings']
 
-URL = "http://www.magento-dev.com"
+URL = "http://dev.magento-dev.com"
 API_USER = LOCAL_SETTINGS.magento_api_username
 API_PASSWORD = LOCAL_SETTINGS.magento_api_password
 
