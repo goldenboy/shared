@@ -59,9 +59,9 @@ class ModelDb(object):
         auth.messages.verify_email = 'Click on the link http://' + host \
             + '/' + request.application \
             + '/default/user/verify_email/%(key)s to verify your email'
-        # registration_requires_approval is False by default but for some
-        # reason it doesn't stick. See if explicitly setting it works.
-        auth.settings.registration_requires_approval = False
+        auth.messages.reset_password = 'Click on the link http://' + host \
+            + '/' + request.application \
+            + '/default/user/reset_password/%(key)s to reset your password'
         return auth
 
     def _crud(self):
