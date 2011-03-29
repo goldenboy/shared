@@ -30,6 +30,9 @@ class TestModelDb(unittest.TestCase):
         # W0212: *Access to a protected member %s of a client class*
         # pylint: disable=W0212
 
+        #
+        # Test with default config file.
+        #
         app_env = env(APPLICATION, import_models=False)
         model_db = ModelDb(app_env)
         self.assertTrue(model_db)  # returns object
@@ -55,6 +58,7 @@ class TestModelDb(unittest.TestCase):
         self.assertTrue(email_re.match(model_db.mail.settings.sender))
 
         self.assertTrue(model_db.auth)  # sets auth property
+
         # admin_email is an email
         self.assertTrue(email_re.match(model_db.auth.settings.admin_email))
         # mailer setting correct
@@ -69,20 +73,47 @@ class TestModelDb(unittest.TestCase):
         self.assertTrue(model_db.service)  # sets service property
         # service has xmlrpc
         self.assertTrue(hasattr(model_db.service, 'xmlrpc'))
+
+        #
+        # Test with custom config file.
+        #
+        config_text = """
+[web2py]
+mail.server = smtp.mymailserver.com:587
+mail.sender = myusername@example.com
+mail.login = myusername:fakepassword
+auth.registration_requires_verification = 1
+auth.registration_requires_approval =
+auth.admin_email = myadmin@example.com
+
+[shared]
+auth.registration_requires_verification =
+auth.registration_requires_approval = 1
+database = shared
+hmac_key = 226bca51c2121b
+magento_api_username = api_user
+magento_api_password = fake_api_password
+mysql_user = shared
+mysql_password = {mysql_pw}
+version = 0.1
+""".format(mysql_pw=model_db.local_settings.mysql_password)
+
+        f_text = '/tmp/TestModelDb_test__init__.txt'
+        _config_file_from_text(f_text, config_text)
+
+        model_db = ModelDb(app_env, config_file=f_text)
+        self.assertTrue(model_db)
+
+        self.assertEqual(model_db.mail.settings.server, 'smtp.mymailserver.com:587')
+        self.assertEqual(model_db.mail.settings.sender, 'myusername@example.com')
+        self.assertEqual(model_db.auth.settings.registration_requires_verification, '')
+        self.assertEqual(model_db.auth.settings.registration_requires_approval, '1')
+
+        os.unlink(f_text)
         return
 
 
 class TestSettingsLoader(unittest.TestCase):
-
-    def _config_file_from_text(self, filename, text):
-
-        # R0201: *Method could be a function*
-        # pylint: disable=R0201
-
-        f = open(filename, 'w')
-        f.write(text)
-        f.close()
-        return
 
     def test____init__(self):
         settings_loader = SettingsLoader()
@@ -185,7 +216,7 @@ email = abc@gmail.com
         f_text = '/tmp/settings_loader_config.txt'
         for t in tests:
             settings_loader = SettingsLoader()
-            self._config_file_from_text(f_text, t['text'])
+            _config_file_from_text(f_text, t['text'])
             settings_loader.config_file = f_text
             settings_loader.application = 'app'
             if t['raise']:
@@ -211,7 +242,7 @@ auth.boolean_setting =
         f_text = '/tmp/settings_loader_config.txt'
         for t in tests:
             settings_loader = SettingsLoader()
-            self._config_file_from_text(f_text, t['text'])
+            _config_file_from_text(f_text, t['text'])
             settings_loader.config_file = f_text
             settings_loader.application = 'app'
             settings_loader.get_settings()
@@ -249,7 +280,7 @@ mail.version = 6.66
 version = 2.22
 email = abc@gmail.com
 """
-        self._config_file_from_text(f_text, text)
+        _config_file_from_text(f_text, text)
         settings_loader.config_file = f_text
         settings_loader.application = application
 
@@ -269,6 +300,17 @@ email = abc@gmail.com
 
         os.unlink(f_text)
         return
+
+
+def _config_file_from_text(filename, text):
+
+    # R0201: *Method could be a function*
+    # pylint: disable=R0201
+
+    f = open(filename, 'w')
+    f.write(text)
+    f.close()
+    return
 
 
 def main():

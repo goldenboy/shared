@@ -19,18 +19,26 @@ import ConfigParser
 
 
 class ModelDb(object):
-
     """Class representing the db.py model"""
 
-    def __init__(self, environment):
+    def __init__(self, environment, config_file=None):
+        """Constructor.
+
+        Args:
+            environment: dict, dictionary defining environment as returned by
+                    gluon/shell.py def env
+            config_file: string, name of file used for configuration settings
+                If None, this is set as per application. See _settings_loader()
+                method.
+        """
         self.environment = environment
+        self.config_file = config_file
         self.DAL = self.environment['DAL']
 
         self.local_settings = Settings()
         self.settings_loader = self._settings_loader()
 
         # The order of these is intentional. Some depend on each other.
-
         self.db = self._db()
         self.mail = self._mail()
         self.auth = self._auth()
@@ -39,9 +47,7 @@ class ModelDb(object):
         return
 
     def _auth(self):
-        """Create a auth instance
-
-        """
+        """Create a auth instance. """
 
         auth = Auth(self.environment, self.db)  # authentication/authorization
         auth.settings.hmac_key = self.local_settings.hmac_key
@@ -128,11 +134,11 @@ class ModelDb(object):
         """Create a settings loader object instance
 
         """
-
         request = self.environment['request']
-        etc_conf_file = os.path.join(request.folder, 'private', 'etc',
-                '%s.conf' % os.environ.get('WEB2PY_SERVER_MODE', 'live'
-                ))
+        etc_conf_file = self.config_file if self.config_file else \
+                os.path.join(request.folder, 'private', 'etc',
+                        '{mode}.conf'.format(mode=os.environ.get(
+                            'WEB2PY_SERVER_MODE', 'live')))
         settings_loader = SettingsLoader(config_file=etc_conf_file,
                 application=request.application)
         settings_loader.import_settings(group='local',
@@ -144,16 +150,13 @@ class ModelDb(object):
         This is run after the registration email is verified. The
         auth.setting.verify_email_onaccept in model/db.py points here.
         """
-
         # Create an admin group if not already done.
-
         admin = 'admin'
         if not self.auth.id_group(admin):
             self.auth.add_group(admin,
                                 description='Administration group')
 
         # Add user to admin group if email matches admin_email.
-
         if user.email == self.auth.settings.admin_email:
             if not self.auth.has_membership(self.auth.id_group(admin),
                     user.id):
@@ -200,19 +203,18 @@ class SettingsLoader(object):
         settings = {}
 
         # The web2py section is required, if not found an exception is raised.
-
         for (name, value) in config.items('web2py'):
             settings[name] = value
+
+        # The application section is optional, if not found the web2py
+        # values are used.
         if self.application:
-
-            # The application section is optional, if not found the web2py
-            # values are used.
-
             try:
                 for (name, value) in config.items(self.application):
                     settings[name] = value
             except ConfigParser.NoSectionError:
                 pass
+
         for key in settings.keys():
             parts = key.split('.', 1)
             if len(parts) == 1:
@@ -236,9 +238,7 @@ class SettingsLoader(object):
         if group == 'auth':
             storage.lock_keys = False  # Required to permit custom settings
         if not group in self.settings:
-
             # nothing to import
-
             return
         for setting in self.settings[group].keys():
             storage[setting] = self.settings[group][setting]
