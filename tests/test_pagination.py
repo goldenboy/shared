@@ -17,10 +17,12 @@ from BeautifulSoup import BeautifulSoup
 import sys
 import unittest
 
+ROW_CLASSES = ['row_odd', 'row_even']
 
 # C0111: Missing docstring
 # R0904: Too many public methods
 # pylint: disable=C0111,R0904
+
 
 class TestNavigator(unittest.TestCase):
 
@@ -228,8 +230,10 @@ class TestPageList(unittest.TestCase):
 class ReportTest(Report):
     """Class sub-classing Report used for testing."""
 
-    def __init__(self, request, report_function, sqldb=None, columns=None):
-        Report.__init__(self, request, report_function, sqldb, columns)
+    def __init__(self, request, report_function, sqldb=None, columns=None,
+            row_classes=None):
+        Report.__init__(self, request, report_function, sqldb, columns,
+                row_classes)
 
     def rows(self, page, items_per_page, order_by, order_dir):
         order_by = 'id' if not order_by else order_by
@@ -383,15 +387,22 @@ class TestReport(unittest.TestCase):
 
         # Verify tr/td data
         data = sim_data()
-        got_rows = [ x.findAll('td') for x in  soup.findAll('tr')[1:]]
-        got_ids = [ int(x[0].string) for x in got_rows]
+        got_trs = soup.findAll('tr')[1:]        # Ignore header row
+        got_tds = [x.findAll('td') for x in got_trs]
+        got_ids = [int(x[0].string) for x in got_tds]
         expect_ids = [x['id'] for x in data]
         self.assertEqual(got_ids, expect_ids)
 
-        got_names = [ x[1].string for x in got_rows]
+        got_names = [x[1].string for x in got_tds]
         expect_names = [x['name'] for x in data]
         self.assertEqual(got_names, expect_names)
 
+        # Verify tr classes
+        self.assertEqual(got_trs[0]['class'], ROW_CLASSES[0])
+        self.assertEqual(got_trs[1]['class'], ROW_CLASSES[1])
+        self.assertEqual(got_trs[2]['class'], ROW_CLASSES[0])
+
+        # Verify pages
         self.assertTrue('pages' in report and report['pages'] == 1)
 
     def test__rows(self):
@@ -512,8 +523,8 @@ def sim_request():
 
 
 def sim_report():
-    return ReportTest(sim_request(), 'some_function', None,
-            sim_columns())
+    return ReportTest(sim_request(), 'some_function', None, sim_columns(),
+            ROW_CLASSES)
 
 
 def as_soup(html):
