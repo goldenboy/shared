@@ -180,7 +180,8 @@ class Report(object):
         request,
         report_function,
         sqldb=None,
-        columns=None
+        columns=None,
+        row_classes=None
         ):
         """Constructor.
 
@@ -188,12 +189,21 @@ class Report(object):
             request: gluon.globals.Request object instance
             report_function: string, name of the report controller function
             sqldb: gluon.sql.SQLDB object instance
+            columns: list of tuples for defining columns
+                [(heading, format callback, order_by, order_dir)...]
+            row_classes: list with class names for rows. Optional, if None,
+                rows are not given a class.
+                Eg: ['report_row_odd', 'report_row_even']
+                    <tr class='report_row_odd'><td>...</td></tr>
+                    <tr class='report_row_even'><td>...</td></tr>
+                    ...
         """
 
         self.request = request
         self.report_function = report_function
         self.sqldb = sqldb
         self.columns = columns
+        self.row_classes = row_classes
         self.column_set = ReportColumnSet()
         try:
             self.column_set.add_columns(self.columns)
@@ -448,7 +458,7 @@ class Report(object):
         tr_rows.append(TR(ths))  # Header row
 
         if records > 0:
-            for row in rows:
+            for i, row in enumerate(rows):
                 tds = []
                 for column in self.column_set.sorted():
                     formatted = ''
@@ -475,7 +485,11 @@ class Report(object):
                     tds.append(TD(formatted,
                                _class=column_class,
                                ))
-                tr_rows.append(TR(tds))
+                tr_params = {}
+                if self.row_classes:
+                    tr_params['_class'] = self.row_classes[i % len(
+                        self.row_classes)]
+                tr_rows.append(TR(tds, **tr_params))
         else:
             tr_rows.append(TR([TD(SPAN('No records found.'),
                 _colspan=len(self.column_set))]))
