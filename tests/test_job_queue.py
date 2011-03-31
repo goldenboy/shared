@@ -16,8 +16,10 @@ import unittest
 from applications.shared.modules.local.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.job_queue import Job, Queue, \
-        QueueEmptyError, QueueLockedError, QueueLockedExtendedError
+        QueueEmptyError, QueueLockedError, QueueLockedExtendedError, \
+        trigger_queue_handler
 from gluon.shell import env
+from gluon.storage import Storage
 
 # C0111: *Missing docstring*
 # R0904: *Too many public methods (%s/%s)*
@@ -217,6 +219,64 @@ class TestQueue(unittest.TestCase):
     def test__unlock(self):
         # See test__lock()
         pass
+
+
+class TestFunctions(unittest.TestCase):
+
+    def test__trigger_queue_handler(self):
+        """
+        Note: this test requires private/bin/queue_trigger.sh exists with this
+        line:
+        echo 'queue_trigger.sh success' > $TMP_DIR/test__trigger_queue_handler.txt
+        """
+        request = APP_ENV['request']
+        expect_content = 'queue_trigger.sh success'
+        tmp_file = os.path.join(TMP_DIR, 'test__trigger_queue_handler.txt')
+        if os.path.exists(tmp_file):
+            os.unlink(tmp_file)
+        self.assertFalse(os.path.exists(tmp_file))
+
+        # Create a queue_trigger.sh script.
+        trigger_script = os.path.join(request.folder, 'private/bin', 'queue_trigger.sh')
+        if os.path.exists(trigger_script):
+            self.fail('Refusing to overwrite existing file: {f}'.format(f=trigger_script))
+
+        text = """#!/bin/bash
+# queue_trigger.sh
+# This script is used for testing: test__trigger_queue_handler
+exec 1> >(logger -p "local7.error" -t "${{0##*/}} (ERROR)" )
+exec 2>&1
+echo '{txt}' > {tmp}
+""".format(txt=expect_content, tmp=tmp_file)
+
+        f = open(trigger_script, 'w')
+        f.write(text)
+        f.close()
+        os.chmod(trigger_script, 0700)
+
+        @trigger_queue_handler(request)
+        def test_function(arg, kwarg=''):
+            return 'arg: {arg}, kwarg: {kwarg}'.format(arg=arg, kwarg=kwarg)
+
+        # Test calling function. Ensure args are passed and expected value
+        # returned.
+        expect = 'arg: 111, kwarg: aaa'
+        self.assertEqual(test_function(111, kwarg='aaa'), expect)
+
+        # decorator runs script in background. Pause a bit for that to
+        # complete.
+        time.sleep(2)
+
+        # Test that queue_trigger.sh was called
+        # * file exists
+        # * file has content.
+        self.assertTrue(os.path.exists(tmp_file))
+        f = open(tmp_file)
+        got = f.read().strip()
+        f.close()
+        self.assertEqual(got, expect_content)
+
+        os.unlink(trigger_script)
 
 
 def main():

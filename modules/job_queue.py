@@ -162,3 +162,19 @@ class Queue(object):
         if os.path.exists(filename):
             os.unlink(filename)
         return
+
+
+
+def trigger_queue_handler(request):
+    """Decorator for triggering activation of queue handler"""
+    def wrapper(f):
+        def wrapped_f(*args, **kwargs):
+            result = f(*args, **kwargs)
+            trigger_script = os.path.join('.', request.folder, 'private/bin', 'queue_trigger.sh')
+            subprocess.Popen([trigger_script])
+            return result
+        return wrapped_f
+    return wrapper
+
+
+
