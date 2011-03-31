@@ -7,6 +7,7 @@ job_queue.py
 Classes related to job queues.
 
 """
+from functools import wraps
 import os
 import shlex
 import subprocess
@@ -168,6 +169,7 @@ class Queue(object):
 def trigger_queue_handler(request):
     """Decorator for triggering activation of queue handler"""
     def wrapper(f):
+        @wraps(f)
         def wrapped_f(*args, **kwargs):
             result = f(*args, **kwargs)
             trigger_script = os.path.join('.', request.folder, 'private/bin', 'queue_trigger.sh')

@@ -256,7 +256,11 @@ echo '{txt}' > {tmp}
 
         @trigger_queue_handler(request)
         def test_function(arg, kwarg=''):
+            """Test function docstring"""
             return 'arg: {arg}, kwarg: {kwarg}'.format(arg=arg, kwarg=kwarg)
+
+        # Make sure functools.wraps prevents decorator from morphing function.
+        self.assertEqual(test_function.__doc__, 'Test function docstring')
 
         # Test calling function. Ensure args are passed and expected value
         # returned.
