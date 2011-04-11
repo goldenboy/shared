@@ -59,11 +59,14 @@ class API(object):
         self.api_classes = {}           # Cache of api classes
         self.api = magento.API(self.url, self.api_user, self.api_password,
                 protocol='xmlrpc')
-        self.api.__enter__()
+        try:
+            self.api.__enter__()
+        except IOError:
+            self.api = None
 
     def __del__(self):
-        self.api.__exit__(None, None, None)
-        #self.api.client.endSession(self.api.session)
+        if self.api:
+            self.api.__exit__(None, None, None)
 
     def api_for_class(self, api_class):
         """Create an API instance for a specific class.

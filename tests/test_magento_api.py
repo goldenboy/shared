@@ -35,6 +35,12 @@ class TestAPI(unittest.TestCase):
         api = API(url=URL, api_user=API_USER, api_password=API_PASSWORD)
         self.assertTrue(api)
 
+        # Test invalid server url
+        api = API(url='www.dtjimk.internal', api_user=API_USER,
+                api_password=API_PASSWORD)
+        self.assertTrue(api)
+        self.assertFalse(api.api)
+
     def test__api_for_class(self):
         """
         As opposed to testing every decorated property, just test a few
