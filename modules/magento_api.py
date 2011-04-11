@@ -30,6 +30,8 @@ modules and methods are used.
     the path be added to the sys.path. See below.
 """
 
+
+from xmlrpclib import ProtocolError
 import os
 import sys
 
@@ -61,7 +63,7 @@ class API(object):
                 protocol='xmlrpc')
         try:
             self.api.__enter__()
-        except IOError:
+        except (IOError, ProtocolError):
             self.api = None
 
     def __del__(self):
