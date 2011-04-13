@@ -58,6 +58,23 @@ NOTES:
         $script -a MYAPP
         $script -d $APP_BASELINE -k $TMP_DIR/MYAPP.out MYAPP $APP_CHANGES
 
+WORKFLOW:
+
+    On dev:
+        New version
+        * Empty changes.sql
+        * Create and save baseline.sql
+        Repeat:
+            * Add midifications to changes.sql as necessary
+            * Run mysql_vc.sh to implement changes
+        Release:
+        * create and save baseline_yyyy-mm-dd.sql
+
+    On live:
+        Release:
+        * Check out new version
+        * Run mysql_vc.sh to implement changes
+        * Diff baseline with baseline_yyyy-mm-dd.sql
 EOF
 }
 
