@@ -12,6 +12,8 @@ from gluon.storage import Settings
 from gluon.tools import Auth, Crud, Mail, Service
 import os
 import ConfigParser
+from applications.shared.modules.ConfigParser_improved import  \
+        ConfigParserImproved
 
 # C0103: *Invalid name "%s" (should match %s)*
 # Some variable names are adapted from web2py.
@@ -44,7 +46,6 @@ class ModelDb(object):
         self.auth = self._auth()
         self.crud = self._crud()
         self.service = self._service()
-        return
 
     def _auth(self):
         """Create a auth instance. """
@@ -188,7 +189,6 @@ class SettingsLoader(object):
 
         self.settings = {}
         self.get_settings()
-        return
 
     def __repr__(self):
         return str(self.__dict__)
@@ -198,24 +198,25 @@ class SettingsLoader(object):
 
         if not self.config_file:
             return
-        config = ConfigParser.RawConfigParser()
+        config = ConfigParserImproved()
         config.read(self.config_file)
         settings = {}
 
         # The web2py section is required, if not found an exception is raised.
-        for (name, value) in config.items('web2py'):
+        for (name, value) in config.items_scrubbed('web2py'):
             settings[name] = value
 
         # The application section is optional, if not found the web2py
         # values are used.
         if self.application:
             try:
-                for (name, value) in config.items(self.application):
+                for (name, value) in config.items_scrubbed(self.application):
                     settings[name] = value
             except ConfigParser.NoSectionError:
                 pass
 
         for key in settings.keys():
+            # Set the group values
             parts = key.split('.', 1)
             if len(parts) == 1:
                 parts.insert(0, 'local')
@@ -223,7 +224,6 @@ class SettingsLoader(object):
             if not group in self.settings:
                 self.settings[group] = {}
             self.settings[group][setting] = settings[key]
-        return
 
     def import_settings(self, group, storage):
         """Import a group of settings into a storage.
@@ -242,4 +242,3 @@ class SettingsLoader(object):
             return
         for setting in self.settings[group].keys():
             storage[setting] = self.settings[group][setting]
-        return

@@ -82,20 +82,20 @@ class TestModelDb(unittest.TestCase):
 mail.server = smtp.mymailserver.com:587
 mail.sender = myusername@example.com
 mail.login = myusername:fakepassword
-auth.registration_requires_verification = 1
-auth.registration_requires_approval =
+auth.registration_requires_verification = True
+auth.registration_requires_approval = False
 auth.admin_email = myadmin@example.com
 
 [shared]
-auth.registration_requires_verification =
-auth.registration_requires_approval = 1
+auth.registration_requires_verification = False
+auth.registration_requires_approval = True
 database = shared
 hmac_key = 226bca51c2121b
 magento_api_username = api_user
 magento_api_password = fake_api_password
 mysql_user = shared
 mysql_password = {mysql_pw}
-version = 0.1
+version = '0.1'
 """.format(mysql_pw=model_db.local_settings.mysql_password)
 
         f_text = '/tmp/TestModelDb_test__init__.txt'
@@ -104,10 +104,15 @@ version = 0.1
         model_db = ModelDb(app_env, config_file=f_text)
         self.assertTrue(model_db)
 
-        self.assertEqual(model_db.mail.settings.server, 'smtp.mymailserver.com:587')
-        self.assertEqual(model_db.mail.settings.sender, 'myusername@example.com')
-        self.assertEqual(model_db.auth.settings.registration_requires_verification, '')
-        self.assertEqual(model_db.auth.settings.registration_requires_approval, '1')
+        self.assertEqual(model_db.mail.settings.server,
+                'smtp.mymailserver.com:587')
+        self.assertEqual(model_db.mail.settings.sender,
+                'myusername@example.com')
+        self.assertEqual(
+                model_db.auth.settings.registration_requires_verification,
+                False)
+        self.assertEqual(model_db.auth.settings.registration_requires_approval,
+                True)
 
         os.unlink(f_text)
         return
@@ -158,7 +163,7 @@ setting = value
                 'raise': None,
                 'text': """
 [web2py]
-version = 1.11
+version = '1.11'
 """,
                 },
             {
@@ -169,7 +174,7 @@ version = 1.11
                 'text': """
 [web2py]
 username = jimk
-version = 1.11
+version = '1.11'
 """,
                 },
             {
@@ -180,10 +185,10 @@ version = 1.11
                 'text': """
 [web2py]
 username = jimk
-version = 1.11
+version = '1.11'
 
 [app]
-version = 2.22
+version = '2.22'
 email = abc@gmail.com
 """,
                 },
@@ -198,16 +203,16 @@ email = abc@gmail.com
                 'text': """
 [web2py]
 auth.username = admin
-auth.version = 3.33
+auth.version = '3.33'
 mail.username = mailer
-mail.version = 4.44
+mail.version = '4.44'
 username = jimk
-version = 1.11
+version = '1.11'
 
 [app]
-auth.version = 5.55
-mail.version = 6.66
-version = 2.22
+auth.version = '5.55'
+mail.version = '6.66'
+version = '2.22'
 email = abc@gmail.com
 """,
                 },
@@ -226,32 +231,53 @@ email = abc@gmail.com
                 settings_loader.get_settings()
             self.assertEqual(settings_loader.settings, t['expect'])
 
-        # Test booleans
-        tests = [{'label': 'boolean true', 'expect': True,
-            'text': """
+        # Test datatype handling.
+        text = \
+            """
 [web2py]
-auth.boolean_setting = 1
-"""
-        },
-        {'label': 'boolean false', 'expect': False,
-        'text': """
-[web2py]
-auth.boolean_setting =
-"""}]
+s01_true = True
+s02_false = False
+s03_int = 123
+s04_float = 123.45
+s05_str1 = my setting
+s06_str2 = 'my setting'
+s07_str_true = 'True'
+s08_str_int = '123'
+s09_str_float = '123.45'
 
-        f_text = '/tmp/settings_loader_config.txt'
-        for t in tests:
-            settings_loader = SettingsLoader()
-            _config_file_from_text(f_text, t['text'])
-            settings_loader.config_file = f_text
-            settings_loader.application = 'app'
-            settings_loader.get_settings()
-            if settings_loader.settings['auth']['boolean_setting']:
-                self.assertTrue(t['expect'])
-            else:
-                self.assertFalse(t['expect'])
+[app]
+"""
+        settings_loader = SettingsLoader()
+        _config_file_from_text(f_text, text)
+        settings_loader.config_file = f_text
+        settings_loader.application = 'app'
+        settings_loader.get_settings()
+
+        self.assertEqual(sorted(settings_loader.settings['local'].keys()),
+            [
+                's01_true',
+                's02_false',
+                's03_int',
+                's04_float',
+                's05_str1',
+                's06_str2',
+                's07_str_true',
+                's08_str_int',
+                's09_str_float',
+            ])
+
+        slocal = settings_loader.settings['local']
+        self.assertEqual(slocal['s01_true'], True)
+        self.assertEqual(slocal['s02_false'], False)
+        self.assertEqual(slocal['s03_int'], 123)
+        self.assertEqual(slocal['s04_float'], 123.45)
+        self.assertEqual(slocal['s05_str1'], 'my setting')
+        self.assertEqual(slocal['s06_str2'], "'my setting'")
+        self.assertEqual(slocal['s07_str_true'], 'True')
+        self.assertEqual(slocal['s08_str_int'], '123')
+        self.assertEqual(slocal['s09_str_float'], '123.45')
+
         os.unlink(f_text)
-        return
 
     def test__import_settings(self):
         settings_loader = SettingsLoader()
@@ -264,20 +290,22 @@ auth.boolean_setting =
         self.assertEqual(storage.keys(), [])
 
         f_text = '/tmp/settings_loader_config.txt'
+
+        # Test defaults and section overrides
         text = \
             """
 [web2py]
 auth.username = admin
-auth.version = 3.33
+auth.version = '3.33'
 mail.username = mailer
-mail.version = 4.44
+mail.version = '4.44'
 username = jimk
-version = 1.11
+version = '1.11'
 
 [app]
-auth.version = 5.55
-mail.version = 6.66
-version = 2.22
+auth.version = '5.55'
+mail.version = '6.66'
+version = '2.22'
 email = abc@gmail.com
 """
         _config_file_from_text(f_text, text)
