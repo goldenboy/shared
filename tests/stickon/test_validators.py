@@ -30,6 +30,8 @@ class TestIS_CURRENCY(unittest.TestCase):
 
     def test____call__(self):
         self.assertEqual(IS_CURRENCY(1, 5)(4), (decimal.Decimal('4'), None))
+        self.assertEqual(IS_CURRENCY(1)(0.4), (0.4,
+            'enter a dollar amount greater than or equal to 1'))
         self.assertEqual(IS_CURRENCY(1, 5)(5.1), (5.1,
             'enter a dollar amount between 1 and 5'))
         self.assertEqual(IS_CURRENCY(
