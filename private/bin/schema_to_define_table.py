@@ -17,11 +17,10 @@ from applications.shared.modules.mysql_schema import ColumnLine, CreateLine, \
         MySQLColumn, MySQLTable, SchemaFile
 from applications.shared.modules.web2py_sql import FieldPropertyDefaultsSet
 from optparse import OptionParser
+import gluon.main               # Sets up logging
 import logging
-import logging.config
 import sys
 
-logging.config.fileConfig('/srv/http/igeejo/web2py/logging.conf')
 LOG = logging.getLogger('app')
 
 VERSION = '0.1'

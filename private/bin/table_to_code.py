@@ -12,14 +12,13 @@ For usage and help:
 # W0404: *Reimport %r (imported line %s)*
 # pylint: disable=W0404
 from optparse import OptionParser
+import gluon.main               # Sets up logging
 import logging
-import logging.config
 import re
 import sys
 
 VERSION = '0.1'
 
-logging.config.fileConfig('/srv/http/igeejo/web2py/logging.conf')
 LOG = logging.getLogger('app')
 
 

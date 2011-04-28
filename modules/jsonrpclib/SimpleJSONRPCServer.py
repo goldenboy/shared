@@ -4,6 +4,7 @@ from jsonrpclib.jsonrpc import USE_UNIX_SOCKETS
 import SimpleXMLRPCServer
 import SocketServer
 import socket
+import gluon.main               # Sets up logging
 import logging
 import os
 import types

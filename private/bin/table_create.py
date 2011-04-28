@@ -13,15 +13,14 @@ For usage and help:
 # pylint: disable=W0404
 from applications.shared.modules.mysql_schema import MySQLColumn, MySQLTable
 from optparse import OptionParser
+import gluon.main               # Sets up logging
 import logging
-import logging.config
 import sys
 
 VERSION = '0.1'
 
 OPTIONS = ['description', 'sequence']
 
-logging.config.fileConfig('/srv/http/igeejo/web2py/logging.conf')
 LOG = logging.getLogger('app')
 
 
