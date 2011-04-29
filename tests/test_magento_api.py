@@ -8,7 +8,7 @@ Test suite for shared/modules/magento_api.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.magento_api import API
 import sys

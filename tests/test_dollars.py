@@ -8,7 +8,7 @@ Test suite for shared/modules/dollars.py
 """
 
 from applications.shared.modules.dollars import Dollars
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 import decimal
 import sys

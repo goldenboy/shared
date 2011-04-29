@@ -7,7 +7,7 @@ Test suite for shared/modules/download_agent.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.download_agent import DownloadAgent, \
     DynamicMozillaCookieJar, ErrorMessage

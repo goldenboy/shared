@@ -13,7 +13,7 @@ import sys
 import time
 import unittest
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.job_queue import Job, Queue, \
         QueueEmptyError, QueueLockedError, QueueLockedExtendedError, \

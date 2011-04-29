@@ -8,7 +8,7 @@ Test suite for shared/modules/db/table.py
 """
 
 # The accounting database is use for testing
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from gluon.validators import IS_DATE, IS_DATETIME, IS_INT_IN_RANGE, \
     IS_IN_DB, IS_IN_SET, IS_LENGTH, IS_NULL_OR

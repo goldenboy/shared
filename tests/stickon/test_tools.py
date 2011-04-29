@@ -7,7 +7,7 @@ Test suite for shared/modules/stickon/tools.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.stickon.tools import ModelDb, SettingsLoader
 from gluon.shell import env

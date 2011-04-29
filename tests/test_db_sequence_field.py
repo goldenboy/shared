@@ -7,7 +7,7 @@ Test suite for shared/modules/db_sequence_field.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.db_sequence_field import DbSequenceField
 from gluon.sql import SQLDB, Field

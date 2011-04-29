@@ -8,7 +8,7 @@ Test suite for shared/modules/phone.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.phone import PhoneNumber
 import sys

@@ -7,7 +7,7 @@ Test suite for shared/modules/mysql_schema.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.web2py_sql import FieldPropertyDefaults, \
     FieldPropertyDefaultsByName, FieldPropertyDefaultsByType, \

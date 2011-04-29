@@ -7,7 +7,7 @@ Test suite for shared/modules/mysql_schema.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.mysql_schema import ColumnLine, \
     CreateLine, MySQLColumn, MySQLTable, SchemaFile, SchemaLine

@@ -7,7 +7,7 @@ Test suite for shared/modules/models.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.tokens import HashToken, WordsRequired
 import sys

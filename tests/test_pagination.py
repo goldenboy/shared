@@ -7,7 +7,7 @@ Test suite for shared/modules/pagination.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
 from applications.shared.modules.pagination import Navigator, PageList, \
         Report, ReportColumnSet

@@ -120,7 +120,7 @@ test_{table}.py
 Test suite for {application}/modules/{table}.py
 
 \"""
-from applications.shared.modules.local.test_runner import LocalTestSuite, \\
+from applications.shared.modules.test_runner import LocalTestSuite, \\
     ModuleTestSuite
 from applications.{application}.modules.{table} import {class_name}
 import sys

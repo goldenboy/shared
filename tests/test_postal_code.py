@@ -8,7 +8,7 @@ Test suite for shared/modules/postal_code.py
 
 """
 
-from applications.shared.modules.local.test_runner import LocalTestSuite, \
+from applications.shared.modules.test_runner import LocalTestSuite, \
         ModuleTestSuite
 from applications.shared.modules.postal_code import CanadianPostalCode, \
         PostalCode, USAZipCode, best_guess_code
