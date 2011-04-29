@@ -2,5 +2,5 @@ cache
 databases
 errors
 sessions
-firearms/private/notifications/*.htm
 *.pyc
+*/private/var/

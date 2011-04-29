@@ -100,7 +100,7 @@ class File(object):
         subdirectory name (optional) module name.
 
         Example:
-        /srv/http/igeejo/web2py/applications/shared/tests/html/table_crud.py
+        /path/to/project/web2py/applications/shared/tests/html/table_crud.py
         application = shared
         sub_directory = html
         module_name = table_crud
@@ -131,7 +131,7 @@ class File(object):
 
         Example
         test script:
-        /srv/http/igeejo/web2py/applications/shared/tests/html/table_crud.py
+        /path/to/project/web2py/applications/shared/tests/html/table_crud.py
         relative_module: applications.shared.modules.tests.html.table_crud
 
         Returns:
@@ -214,7 +214,7 @@ class FileSet(object):
 
         Example:
             filename:
-                /srv/http/igeejo/web2py/applications/imdb/tests/test_page.py
+                /path/to/project/web2py/applications/imdb/tests/test_page.py
             relative module:
                 applications.imdb.tests.test_page
         Return:
@@ -229,7 +229,7 @@ class FileSet(object):
     def test_directories(self):
         """Get tests directories for all applications
 
-        Example: /srv/http/igeejo/web2py/applications/imdb/tests
+        Example: /path/to/project/web2py/applications/imdb/tests
 
         Returns:
             list, list of path names
@@ -339,7 +339,7 @@ class Module(object):
         subdirectory name (optional) module name.
 
         Example:
-        /srv/http/igeejo/web2py/applications/shared/modules/html/table_crud.py
+        /path/to/project/web2py/applications/shared/modules/html/table_crud.py
 
             application = shared
             sub_directory = db
@@ -372,7 +372,7 @@ class Module(object):
 
         Example
         filename:
-        /srv/http/igeejo/web2py/applications/shared/modules/html/table_crud.py
+        /path/to/project/web2py/applications/shared/modules/html/table_crud.py
         relative_module: applications.shared.modules.html.table_crud
 
         Returns:

@@ -21,7 +21,6 @@ class LocalEnvironment(object):
 
         @auth.requires_membership('admin')
         def environment():
-            """Display environment variables controller."""
             from applications.shared.modules.local.environment import LocalEnvironment
             local_env = LocalEnvironment(request=request, session=session,
                                          auth=auth, beauty=BEAUTIFY, db=db)

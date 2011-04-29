@@ -10,6 +10,7 @@ Classes extending functionality of gluon/tools.py.
 from applications.shared.modules.mysql import LocalMySQL
 from gluon.storage import Settings
 from gluon.tools import Auth, Crud, Mail, Service
+import logging
 import os
 import ConfigParser
 from applications.shared.modules.ConfigParser_improved import  \
@@ -18,6 +19,8 @@ from applications.shared.modules.ConfigParser_improved import  \
 # C0103: *Invalid name "%s" (should match %s)*
 # Some variable names are adapted from web2py.
 # pylint: disable=C0103
+
+LOG = logging.getLogger('app')
 
 
 class ModelDb(object):
@@ -53,16 +56,20 @@ class ModelDb(object):
         auth = Auth(self.environment, self.db)  # authentication/authorization
         auth.settings.hmac_key = self.local_settings.hmac_key
         auth.define_tables(fake_migrate=True)  # creates all needed tables
-        self.settings_loader.import_settings(group='auth',
-                storage=auth.settings)
+        if self.settings_loader:
+            self.settings_loader.import_settings(group='auth',
+                    storage=auth.settings)
         auth.settings.mailer = self.mail
         auth.settings.verify_email_onaccept = self.verify_email_onaccept
-        host = 'www.igeejo.com'
+        host = ''
         request = self.environment['request']
         if 'wsgi' in request.keys():
             if 'environ' in request['wsgi'].keys():
                 host = request['wsgi']['environ']['HTTP_HOST']
-
+        elif 'env' in request.keys():
+            host = request.env.http_post
+        else:
+            LOG.warn("No host for verify_email and reset_password links")
         auth.messages.verify_email = 'Click on the link http://' + host \
             + '/' + request.application \
             + '/default/user/verify_email/%(key)s to verify your email'
@@ -103,13 +110,16 @@ class ModelDb(object):
             #   from google.appengine.api.memcache import Client
             #   session.connect(request, response, db=MEMDB(Client())
 
-            # else use a normal relational database
-
-            local_mysql = LocalMySQL(request=request,
-                    database=self.local_settings.database,
-                    user=self.local_settings.mysql_user,
-                    password=self.local_settings.mysql_password)
-            db = self.DAL(local_mysql.sqldb, check_reserved=['mysql'])
+            if self.settings_loader:
+                # load using custom mysql class
+                local_mysql = LocalMySQL(request=request,
+                        database=self.local_settings.database,
+                        user=self.local_settings.mysql_user,
+                        password=self.local_settings.mysql_password)
+                db = self.DAL(local_mysql.sqldb, check_reserved=['mysql'])
+            else:
+                # else use a normal relational database
+                db = self.DAL('sqlite://storage.sqlite')
         return db
 
     def _mail(self):
@@ -118,8 +128,9 @@ class ModelDb(object):
         """
 
         mail = Mail()  # mailer
-        self.settings_loader.import_settings(group='mail',
-                storage=mail.settings)
+        if self.settings_loader:
+            self.settings_loader.import_settings(group='mail',
+                    storage=mail.settings)
         return mail
 
     def _service(self):
@@ -140,6 +151,10 @@ class ModelDb(object):
                 os.path.join(request.folder, 'private', 'etc',
                         '{mode}.conf'.format(mode=os.environ.get(
                             'WEB2PY_SERVER_MODE', 'live')))
+        if not os.path.exists(etc_conf_file):
+            LOG.debug("Local configuration file not found: {file}".format(
+                    file=etc_conf_file))
+            return None
         settings_loader = SettingsLoader(config_file=etc_conf_file,
                 application=request.application)
         settings_loader.import_settings(group='local',

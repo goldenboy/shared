@@ -18,7 +18,7 @@ TMP_DIR = '/tmp'
 def main():
     """ Main routine. """
 
-    testset = FileSet('/srv/http/igeejo/web2py', want=sys.argv[1:])
+    testset = FileSet('/srv/http/igeejo.com/web2py', want=sys.argv[1:])
     for test_file in testset.want_test_files():
         print 'Updating: {script}'.format(script=test_file.filename)
         module_object = test_file.module_object()
