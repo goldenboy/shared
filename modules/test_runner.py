@@ -18,6 +18,7 @@ import unittest
 
 from applications.shared.modules.testing import FileSet
 
+
 # Decorator
 def count_diff(func):
     """Decorator used to display the effect of a function on mysql record
@@ -148,8 +149,8 @@ class MyTextTestRunner(unittest.TextTestRunner):
     # pylint: disable=W0212
     # pylint: disable=W0231
 
-    def __init__(self, stream=sys.stdout, stream_err=sys.stderr, descriptions=1,
-            verbosity = 1):
+    def __init__(self, stream=sys.stdout, stream_err=sys.stderr,
+            descriptions=1, verbosity=1):
         """Constructor."""
         self.stream = unittest.runner._WritelnDecorator(stream)
         self.stream_err = unittest.runner._WritelnDecorator(stream_err)
@@ -184,7 +185,8 @@ class MyTextTestRunner(unittest.TextTestRunner):
             if failed:
                 self.stream_err.write("failures=%d" % failed)
             if errored:
-                if failed: self.stream_err.write(", ")
+                if failed:
+                    self.stream_err.write(", ")
                 self.stream_err.write("errors=%d" % errored)
             self.stream_err.writeln(")")
         else:
@@ -328,6 +330,7 @@ def _mock_date(self, today_value=None):
             return today_value
     return MockDate
 
+
 def _mock_datetime(self, now_value=None):
     """Function used to override the datetime.datetime function in tests."""
     # pylint: disable=W0613
@@ -339,12 +342,13 @@ def _mock_datetime(self, now_value=None):
             return now_value
     return MockDatetime
 
+
 def main():
 
     """
     Run all test modules in test directories
     """
-    usage = "%prog [options] project [application... ] [test_file.py...]"
+    usage = "%prog [options] path/to/web2py [app... ] [test_file.py...]"
 
     parser = OptionParser(usage=usage)
 
@@ -355,12 +359,13 @@ def main():
     (options, args) = parser.parse_args()
 
     if len(args) < 1:
-        print >> sys.stderr, 'Please provide a project.'
+        print >> sys.stderr, \
+            'Please provide the path to the project web2py directory.'
+        print >> sys.stderr, 'Example: /srv/http/example.com/web2py'
         parser.print_help()
         exit(1)
 
-    project = args.pop(0)
-    project_path = '/srv/http/{project}/web2py'.format(project=project)
+    project_path = args.pop(0)
     if not os.path.exists(project_path):
         print >> sys.stderr, \
             'Invalid project. Directory does not exist: {path}'.format(
@@ -385,4 +390,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

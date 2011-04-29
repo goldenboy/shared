@@ -19,7 +19,6 @@ from applications.shared.modules.job_queue import Job, Queue, \
         QueueEmptyError, QueueLockedError, QueueLockedExtendedError, \
         trigger_queue_handler
 from gluon.shell import env
-from gluon.storage import Storage
 
 # C0111: *Missing docstring*
 # R0904: *Too many public methods (%s/%s)*
