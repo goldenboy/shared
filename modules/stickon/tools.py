@@ -112,6 +112,8 @@ class ModelDb(object):
 
             if self.settings_loader:
                 # load using custom mysql class
+                LOG.debug("self.local_settings.mysql_user: {var}".format(var=self.local_settings.mysql_user))
+                LOG.debug("{var}".format(var=self.local_settings.mysql_password))
                 local_mysql = LocalMySQL(request=request,
                         database=self.local_settings.database,
                         user=self.local_settings.mysql_user,
