@@ -55,7 +55,7 @@ class ModelDb(object):
 
         auth = Auth(self.environment, self.db)  # authentication/authorization
         auth.settings.hmac_key = self.local_settings.hmac_key
-        auth.define_tables(fake_migrate=True)  # creates all needed tables
+        auth.define_tables()                    # creates all needed tables
         if self.settings_loader:
             self.settings_loader.import_settings(group='auth',
                     storage=auth.settings)
@@ -116,7 +116,8 @@ class ModelDb(object):
                         database=self.local_settings.database,
                         user=self.local_settings.mysql_user,
                         password=self.local_settings.mysql_password)
-                db = self.DAL(local_mysql.sqldb, check_reserved=['mysql'])
+                db = self.DAL(local_mysql.sqldb, check_reserved=['mysql'],
+                        migrate=False)
             else:
                 # else use a normal relational database
                 db = self.DAL('sqlite://storage.sqlite')
