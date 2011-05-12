@@ -63,7 +63,6 @@ db.define_table('account',
     db.Field('modified_date', 'datetime',
         requires=IS_NULL_OR(IS_DATETIME(format=T('%Y-%m-%d %H:%M:%S'))),
         ),
-    migrate=False,
     )
 
 """
@@ -115,7 +114,6 @@ db.define_table('company',
     db.Field('modified_date', 'datetime',
         requires=IS_NULL_OR(IS_DATETIME(format=T('%Y-%m-%d %H:%M:%S'))),
         ),
-    migrate=False,
     )
 
 """
@@ -157,7 +155,6 @@ db.define_table('job',
         writable=False,
         requires=IS_DATETIME(),
         ),
-    migrate=False,
     )
 
 """
@@ -185,6 +182,5 @@ db.define_table('setting',
         'string',
         requires=IS_NOT_EMPTY(),
         ),
-    migrate=False,
     )
 
