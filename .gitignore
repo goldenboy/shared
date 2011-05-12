@@ -1,6 +1,6 @@
+*.pyc
 cache
 databases
 errors
+private/var/
 sessions
-*.pyc
-*/private/var/
