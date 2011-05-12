@@ -116,8 +116,12 @@ class ModelDb(object):
                         database=self.local_settings.database,
                         user=self.local_settings.mysql_user,
                         password=self.local_settings.mysql_password)
-                db = self.DAL(local_mysql.sqldb,
-                        check_reserved=['mysql', 'sqlite'],
+                check_reserved = None
+                if self.local_settings.check_reserved and \
+                        self.local_settings.check_reserved != 'None':
+                    check_reserved = self.local_settings.check_reserved.split(
+                            ',')
+                db = self.DAL(local_mysql.sqldb, check_reserved=check_reserved,
                         migrate=False)
             else:
                 # else use a normal relational database
