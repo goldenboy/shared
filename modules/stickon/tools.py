@@ -85,7 +85,6 @@ class ModelDb(object):
         # for CRUD helpers using auth
 
         crud = Crud(self.environment, self.db)
-        crud.settings.auth = self.auth  # enforces authorization on crud
         return crud
 
     def _db(self):

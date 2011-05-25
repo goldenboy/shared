@@ -65,8 +65,6 @@ class TestModelDb(unittest.TestCase):
         self.assertEqual(model_db.auth.settings.mailer, model_db.mail)
 
         self.assertTrue(model_db.crud)  # sets crud property
-        # auth setting correct
-        self.assertEqual(model_db.crud.settings.auth, model_db.auth)
         # has log_event attr
         self.assertTrue(hasattr(model_db.crud, 'log_event'))
 
