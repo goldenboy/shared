@@ -36,10 +36,13 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(api)
 
         # Test invalid server url
-        api = API(url='www.dtjimk.internal', api_user=API_USER,
-                api_password=API_PASSWORD)
-        self.assertTrue(api)
-        self.assertFalse(api.api)
+        try:
+            api = API(url='www.dtjimk.internal', api_user=API_USER,
+                    api_password=API_PASSWORD)
+        except IOError:
+            pass            # Expected
+        else:
+            self.fail('IOError not raised')
 
     def test__api_for_class(self):
         """

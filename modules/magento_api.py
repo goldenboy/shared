@@ -30,10 +30,11 @@ modules and methods are used.
     the path be added to the sys.path. See below.
 """
 
-
 from xmlrpclib import ProtocolError
 import os
 import sys
+import gluon.main           # Sets up logging
+import logging
 
 sys.path.append(os.path.join(os.getcwd(), 'applications/shared/modules'))
 
@@ -42,6 +43,8 @@ sys.path.append(os.path.join(os.getcwd(), 'applications/shared/modules'))
 
 import magento
 import magento_custom
+
+LOG = logging.getLogger('app')
 
 
 class API(object):
@@ -64,11 +67,14 @@ class API(object):
         try:
             self.api.__enter__()
         except (IOError, ProtocolError):
-            self.api = None
+            # Re-raise so calling program can catch
+            raise
 
     def __del__(self):
-        if self.api:
+        try:
             self.api.__exit__(None, None, None)
+        except AttributeError as err:
+            LOG.debug("__del__: {err}".format(err=err))
 
     def api_for_class(self, api_class):
         """Create an API instance for a specific class.
