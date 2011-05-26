@@ -73,7 +73,7 @@ class API(object):
     def __del__(self):
         try:
             self.api.__exit__(None, None, None)
-        except AttributeError as err:
+        except (AttributeError, ProtocolError) as err:
             LOG.debug("__del__: {err}".format(err=err))
 
     def api_for_class(self, api_class):
