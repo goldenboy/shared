@@ -57,3 +57,20 @@ class IS_NOT_ALL_EMPTY(object):
         if reduce(lambda x, y: x and y, empties):
             return error
         return okay
+
+
+class BOTH_NOT_EMPTY(object):
+    """Validator class for presense of atleast one value."""
+    def __init__(self, other_value, error_message='enter a value', strip=True):
+        self.other_value = other_value
+        self.error_message = error_message
+        self.strip = strip
+
+    def __call__(self, value):
+        if self.strip:
+            self.other_value = self.other_value.strip()
+            value = value.strip()
+        if not self.other_value and not value:
+            return (value, self.error_message)
+        else:
+            return (value, None)
