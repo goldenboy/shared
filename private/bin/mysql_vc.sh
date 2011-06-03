@@ -171,3 +171,5 @@ if [[ $diff ]]; then
     __v && __mi "Diff'ing baseline of $db with: $diff"
     diff -u $baseline $diff
 fi
+__v && __mi "Done."
+exit 0
