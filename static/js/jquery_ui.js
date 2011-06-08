@@ -1,1 +1,0 @@
-jquery_ui/js/jquery-ui-1.8.5.custom.min.js
