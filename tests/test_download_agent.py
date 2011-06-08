@@ -33,16 +33,18 @@ class TestDownloadAgent(unittest.TestCase):
 
     def test_download(self):
         tests = [
-                {
-                    'label': 'valid url',
-                    'url': 'http://www.example.com',
-                    'expect': '<title>IANA &mdash; Example domains</title>'
-                    },
-                    {
-                     'label': 'invalid url',
-                     'url': 'http://www.xxxxxxxxxxfakeurlxxxxxxxxxxx.com',
-                     'expect': None
-                     }]
+            {
+                'label': 'valid url',
+                'url': 'http://www.example.com',
+                'expect': '<title>IANA &mdash; Example domains</title>',
+            },
+            {
+                 # We're using openDNS that redirects invalid urls to notice
+                 # page so it will return content.
+                 'label': 'invalid url',
+                 'url': 'http://www.xxxxxxxxxxfakeurlxxxxxxxxxxx.com',
+                 'expect': '<title>  </title>',
+             }]
 
         for test in tests:
             da = DownloadAgent(url=test['url'])
