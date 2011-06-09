@@ -43,7 +43,7 @@ class TestDownloadAgent(unittest.TestCase):
                  # page so it will return content.
                  'label': 'invalid url',
                  'url': 'http://www.xxxxxxxxxxfakeurlxxxxxxxxxxx.com',
-                 'expect': '<title>  </title>',
+                 'expect': None,
              }]
 
         for test in tests:
