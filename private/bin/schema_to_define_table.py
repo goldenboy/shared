@@ -80,7 +80,6 @@ def define_table_code(table, defaults_set=None):
             Field('group_id',
                 'integer'
                 ),
-            migrate=False,
             )
 
     """
@@ -90,7 +89,6 @@ def define_table_code(table, defaults_set=None):
     indents.append("db.define_table('%s'" % table.name)
     for c in table.columns:
         indents.extend(define_field_code(c, defaults_set=defaults_set))
-    indents.append('migrate=False')
     indents.append(')')
     delimiter = ',\n%s' % INDENT
     lines.append(delimiter.join(indents))
