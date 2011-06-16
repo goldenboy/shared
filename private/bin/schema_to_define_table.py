@@ -74,10 +74,10 @@ def define_table_code(table, defaults_set=None):
 
     Example:
         db.define_table('my_collection',
-            db.Field('name',
+            Field('name',
                 requires=IS_NOT_EMPTY()
                 ),
-            db.Field('group_id',
+            Field('group_id',
                 'integer'
                 ),
             migrate=False,
@@ -107,7 +107,7 @@ def define_field_code(column, defaults_set=None):
         string, Text representing the define table statement.
 
     Example:
-        db.Field('name',
+        Field('name',
             requires=IS_NOT_EMPTY()
             ),
 
@@ -139,9 +139,9 @@ def define_field_code(column, defaults_set=None):
 
     LOG.debug("params: {var}".format(var=params))
     if fieldname:
-        lines.append("db.Field('%s'" % fieldname)
+        lines.append("Field('%s'" % fieldname)
     else:
-        lines.append("db.Field('%s'" % column.name)
+        lines.append("Field('%s'" % column.name)
 
     column_type = column.data_type
     if 'type' in params:
