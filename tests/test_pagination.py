@@ -56,6 +56,32 @@ class TestNavigator(unittest.TestCase):
         nav = Navigator(['p1', 'p2'])
         self.assertEqual(len(nav), 2)
 
+    def test_first(self):
+        nav = Navigator([])
+        self.assertEqual(nav.first(), '')
+
+        pages = ['p1', 'p2', 'p3']
+        nav = Navigator(pages)
+        nav.page = ''
+        self.assertEqual(nav.first(), 'p1')
+
+        for p in pages:
+            nav.page = p
+            self.assertEqual(nav.first(), 'p1')
+
+    def test_last(self):
+        nav = Navigator([])
+        self.assertEqual(nav.last(), '')
+
+        pages = ['p1', 'p2', 'p3']
+        nav = Navigator(pages)
+        nav.page = ''
+        self.assertEqual(nav.last(), 'p3')
+
+        for p in pages:
+            nav.page = p
+            self.assertEqual(nav.last(), 'p3')
+
     def test_next(self):
         nav = Navigator([])
         self.assertEqual(nav.next(), '')

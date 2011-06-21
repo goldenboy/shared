@@ -31,6 +31,26 @@ class Navigator(object):
     def __len__(self):
         return len(self.pages)
 
+    def first(self):
+        """Return the first page.
+
+        Returns:
+            string, name of first page.
+        """
+        if len(self.pages) == 0:
+            return ''
+        return self.pages[0]
+
+    def last(self):
+        """Return the last page.
+
+        Returns:
+            string, name of last page.
+        """
+        if len(self.pages) == 0:
+            return ''
+        return self.pages[-1]
+
     def next(self, count=1):
         """Return the next page.
 
