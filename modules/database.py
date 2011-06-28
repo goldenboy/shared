@@ -151,7 +151,7 @@ class Collection(object):
                     Example: db.person.name
                     Defaults: self.tbl_.id, ie by id
             limitby: integer or tuple. Tuple is format (start, stop). If
-                    integer converted to tuple (0, integer)
+                    integer, it is converted to tuple (0, integer)
                     Examples:
                         limitby=None        return all records
                         limitby=100         return first 100 records
