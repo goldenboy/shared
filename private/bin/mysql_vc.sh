@@ -34,12 +34,13 @@ NOTES:
     runs the commnds in a file and updates the database accordingly.
 
     If the -b baseline option is not provided, the baseline is dumped
-    into a tmp file.
+    into a tmp file in $TMP_DIR
 
-    With the -o options option, put multiple options in quotes.
+    With the -o, -od, -om options option, put multiple options in quotes.
 
     To continue running commands even if commands produce errors, use
-    the mysql --force option. For example:
+    the mysql -f, --force option. Note this is an option for mysql not
+    the script. For example:
 
         $script -o "-u root --force" db /path/to/commands.sql
 
@@ -52,11 +53,21 @@ NOTES:
         # This will prompt for password only once (recommended)
         $script -o "-u root" -p db /path/to/commands.sql
 
-    With the -a application option, several default values are set. Values
-    provided specifically on the command line take precedence. These two
-    commands are equivalent.
+    With the -a application option, several default values are set.
+    For example, with this command: $script -a MYAPP, the following assumptions
+    are made:
+        The two arguments are assumed.
+        The database is assumed to be MYAPP. (One exception, app=imdb, db=imdb_log)
+        The path to the commands file is assumed $APP_CHANGES
+        The -d option is assumed, with a value $APP_BASELINE
+        The -k option is assumed, with a value $TMP_DIR/MYAPP.out
+
+    These two commands are equivalent.
+
         $script -a MYAPP
         $script -d $APP_BASELINE -k $TMP_DIR/MYAPP.out MYAPP $APP_CHANGES
+
+    Values provided specifically on the command line take precedence.
 
 WORKFLOW:
 
@@ -122,6 +133,7 @@ _options() {
     (( ${#args[@]} > 1 )) && commands=${args[1]}
     [[ $app && ! $db ]] && db=$app
     [[ $app && $db == 'imdb' ]] && db='imdb_log'
+    [[ $app && ! $backup ]] && backup=$TMP_DIR/$app.out
     [[ $app && ! $commands ]] && commands=${APP_CHANGES//MYAPP/$app}
     [[ $app && ! $diff ]] && diff=${APP_BASELINE//MYAPP/$app}
     [[ ! $baseline && $diff ]] && mkdir -p $TMP_DIR && baseline=$(mktemp --tmpdir=$TMP_DIR)
