@@ -158,12 +158,14 @@ db.define_table('job',
     )
 
 """
-setting                 # Used by test_setting
+setting
 
-name         varchar     # FIXME
-label        varchar     # FIXME
-value        varchar     # FIXME
-description  varchar     # FIXME
+name         varchar     # name of setting
+label        varchar     # Label for input of setting
+value        varchar     # Value of setting
+description  varchar     # Description of setting (used as input comment)
+type         varchar     # Type of setting, must match web2py Field type.
+requires     varchar     # Web2py Field requires value
 """
 db.define_table('setting',
     Field('name',
@@ -182,5 +184,27 @@ db.define_table('setting',
         'string',
         requires=IS_NOT_EMPTY(),
         ),
+    Field('type',
+        'string',
+        default='string',
+        requires=IS_IN_SET([
+            'blob',
+            'boolean',
+            'date',
+            'datetime',
+            'decimal(18, 4)',
+            'double',
+            'integer',
+            'password',
+            'string',
+            'text',
+            'time',
+            'upload',
+            ]),
+        ),
+    Field('width_px',
+        type='int',
+        default=138,
+        comment='138 pixels is standard',
+        ),
     )
-

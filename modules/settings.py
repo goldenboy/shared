@@ -19,6 +19,14 @@ class Setting(DbObject):
         """Constructor."""
         DbObject.__init__(self, tbl_, **kwargs)
 
+    def formatted_value(self):
+        """Return the setting value formatted."""
+        if self.type == 'boolean':
+            value = True if self.value == 'True' else False
+        else:
+            value = self.value
+        return value
+
     @classmethod
     def get(cls, dbset, name):
         """Convenience method for accessing a setting value by name.
@@ -42,7 +50,7 @@ class Setting(DbObject):
             raise ValueError(
                     'Cannot access setting "{name}": No such setting.'.format(
                         name=name))
-        return setting.value
+        return setting.formatted_value()
 
     @classmethod
     def match(cls, dbset, wildcard, as_dict=False):
@@ -63,7 +71,7 @@ class Setting(DbObject):
         if as_dict:
             settings_dict = {}
             for setting in settings:
-                settings_dict[setting.name] = setting.value
+                settings_dict[setting.name] = setting.formatted_value()
             return settings_dict
         else:
             return settings
