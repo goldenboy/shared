@@ -116,5 +116,6 @@ class TableCRUD(Report):
         elif form.errors:
             self.response.flash = 'Form could not be submitted.' + \
                 'Please make corrections.'
-
+        elif not self.response.flash:
+            self.response.flash = "Fill out the form and submit."
         return dict(form=form, action=action, table=self.table_name)
