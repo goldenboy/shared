@@ -1,5 +1,5 @@
 
-from applications.shared.modules.stickon.tools import ModelDb
+ModelDb = local_import('stickon/tools', app='shared', reload=DEBUG).ModelDb
 
 model_db = ModelDb(globals())
 db = model_db.db
