@@ -45,7 +45,7 @@ class Setting(DbObject):
 
         """
         query = (dbset.setting.name == name)
-        setting = cls(dbset.setting).set_.get(query=query).first()
+        setting = Setting(dbset.setting).set_.get(query=query).first()
         if not setting:
             raise ValueError(
                     'Cannot access setting "{name}": No such setting.'.format(
@@ -67,7 +67,7 @@ class Setting(DbObject):
             dict, if as_dict=True, dictionary of name/value pairs
         """
         query = (dbset.setting.name.like(wildcard))
-        settings = cls(dbset.setting).set_.get(query=query)
+        settings = Setting(dbset.setting).set_.get(query=query)
         if as_dict:
             settings_dict = {}
             for setting in settings:
