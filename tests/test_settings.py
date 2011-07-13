@@ -13,6 +13,7 @@ from applications.shared.modules.test_runner import LocalTestSuite, \
 from applications.shared.modules.database import Collection
 from applications.shared.modules.settings import Setting
 from gluon.shell import env
+import gluon.main
 import sys
 import unittest
 
@@ -48,6 +49,7 @@ class TestSetting(unittest.TestCase):
             ('_test__formatted_3', 'True',      'boolean', True),
             ('_test__formatted_4', 'False',     'boolean', False),
             ('_test__formatted_5', '',          'boolean', False),
+            ('_test__formatted_6', '123',       'integer', 123),
             ]
         for t in tests:
             kwargs = dict(name=t[0], value=t[1], type=t[2])
@@ -63,6 +65,7 @@ class TestSetting(unittest.TestCase):
             ('_test__get_4', 'True',              'boolean', True),
             ('_test__get_5', 'False',             'boolean', False),
             ('_test__get_6', '',                  'boolean', False),
+            ('_test__get_7', '123',               'integer', 123),
             ]
 
         for t in tests:

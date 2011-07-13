@@ -23,6 +23,8 @@ class Setting(DbObject):
         """Return the setting value formatted."""
         if self.type == 'boolean':
             value = True if self.value == 'True' else False
+        elif self.type == 'integer':
+            value = int(self.value)
         else:
             value = self.value
         return value
