@@ -165,7 +165,7 @@ label        varchar     # Label for input of setting
 value        varchar     # Value of setting
 description  varchar     # Description of setting (used as input comment)
 type         varchar     # Type of setting, must match web2py Field type.
-requires     varchar     # Web2py Field requires value
+width_px     varchar     # Width of input field in pixels
 """
 db.define_table('setting',
     Field('name',
@@ -203,7 +203,7 @@ db.define_table('setting',
             ]),
         ),
     Field('width_px',
-        type='int',
+        'integer',
         default=138,
         comment='138 pixels is standard',
         ),
