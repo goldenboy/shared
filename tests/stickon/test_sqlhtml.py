@@ -9,8 +9,8 @@ Test suite for shared/modules/stickon/validators.py
 
 from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
-from applications.shared.modules.stickon.sqlhtml import InputWidget, \
-        SelectWidget
+from applications.shared.modules.stickon.sqlhtml import AutoCompleteWidget, \
+        InputWidget, SelectWidget
 from BeautifulSoup import BeautifulSoup
 from gluon.shell import env
 import sys
@@ -25,8 +25,16 @@ import unittest
 # shared database should have tables account and company. The models/db.py
 # should define the tables.
 
-APP_ENV = env(__file__.split('/')[-4], import_models=True)
-DBH = APP_ENV['db']
+#APP_ENV = env(__file__.split('/')[-4], import_models=True)
+#DBH = APP_ENV['db']
+DBH = db
+
+
+class TestAutoCompleteWidget(unittest.TestCase):
+
+    def test____init__(self):
+        acw = AutoCompleteWidget()
+        self.assertTrue(acw)
 
 
 class TestInputWidget(unittest.TestCase):
