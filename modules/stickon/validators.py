@@ -74,3 +74,44 @@ class NOT_EMPTY_IF_OTHER(object):
             return (value, self.error_message)
         else:
             return (value, None)
+
+
+class NOT_EMPTY_IF_OTHER_BY_ID(object):
+    """Validator class for "Other" text input.
+
+    Like NOT_EMPTY_IF_OTHER but used when OPTION tag values are ids not names.
+
+    If 'Other' is selected from a drop down menu, then the text input must
+    include a description value.
+    """
+    def __init__(self, field, selected_id, error_message='enter a value'):
+        """Constructor
+
+        Args:
+            field: gluon.dal.Field, eg db.table.field, the field that contains
+                the value of the selected option
+            selected_id: integer, id of the option selected in the drop menu.
+            error_message: string
+        """
+        self.field = field
+        self.selected_id = selected_id
+        self.error_message = error_message
+
+    def __call__(self, value):
+        db = self.field.table._db
+        id_field = self.field.table.id
+
+        # Example: self.field = db.type.name
+        # selected_value = db(db.type.id == request.vars.type_id).select(
+        #       db.type.name)[0].name
+        try:
+            selected_value = self.field.table._db(
+                    self.field.table.id == self.selected_id).select(
+                            self.field)[0][self.field.name]
+        except IndexError:
+            selected_value = ''
+
+        if selected_value == 'Other' and not value:
+            return (value, self.error_message)
+        else:
+            return (value, None)

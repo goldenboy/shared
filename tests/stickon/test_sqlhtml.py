@@ -24,10 +24,10 @@ import unittest
 # The test script requires an existing database to work with. The
 # shared database should have tables account and company. The models/db.py
 # should define the tables.
-
-#APP_ENV = env(__file__.split('/')[-4], import_models=True)
-#DBH = APP_ENV['db']
-DBH = db
+# Note: When run with python web2py.py, the __file__ value is not what you
+# might expect.  __file__ = applications/shared/models/db.py
+APP_ENV = env(__file__.split('/')[-3], import_models=True)
+DBH = APP_ENV['db']
 
 
 class TestAutoCompleteWidget(unittest.TestCase):

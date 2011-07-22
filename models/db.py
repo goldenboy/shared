@@ -208,3 +208,49 @@ db.define_table('setting',
         comment='138 pixels is standard',
         ),
     )
+
+"""
+test
+
+company_id     int         # Test company field
+number         int         # Test number field
+name           text        # Test name field
+amount         decimal     # Test amount field
+start_date     date        # Test start_date field
+status         char        # Test status field
+creation_date  datetime    # Record created timestamp
+modified_date  datetime    # Record last modified timestamp
+"""
+db.define_table('test',
+    Field('company_id',
+        'integer',
+        ),
+    Field('number',
+        'integer',
+        ),
+    Field('name',
+        'text',
+        ),
+    Field('amount',
+        'decimal(18,2)',
+        ),
+    Field('start_date',
+        'date',
+        requires=IS_DATE(),
+        ),
+    Field('status',
+        'boolean',
+        requires=IS_IN_SET([('a', 'Enabled'), ('d', 'Disabled')], zero=None),
+        ),
+    Field('creation_date',
+        'datetime',
+        writable=False,
+        requires=IS_DATETIME(),
+        ),
+    Field('modified_date',
+        'datetime',
+        writable=False,
+        requires=IS_DATETIME(),
+        ),
+    )
+
