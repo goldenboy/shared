@@ -13,6 +13,7 @@ from applications.shared.modules.stickon.sqlhtml import AutoCompleteWidget, \
         InputWidget, SelectWidget
 from BeautifulSoup import BeautifulSoup
 from gluon.shell import env
+import gluon.main               # Sets up logging (if logging in module)
 import sys
 import unittest
 
@@ -24,16 +25,16 @@ import unittest
 # The test script requires an existing database to work with. The
 # shared database should have tables account and company. The models/db.py
 # should define the tables.
-# Note: When run with python web2py.py, the __file__ value is not what you
-# might expect.  __file__ = applications/shared/models/db.py
-APP_ENV = env(__file__.split('/')[-3], import_models=True)
+APP_ENV = env(__file__.split('/')[-4], import_models=True)
 DBH = APP_ENV['db']
 
 
 class TestAutoCompleteWidget(unittest.TestCase):
 
     def test____init__(self):
-        acw = AutoCompleteWidget()
+        request = APP_ENV['request']
+        field = DBH.test.name
+        acw = AutoCompleteWidget(request, field)
         self.assertTrue(acw)
 
 

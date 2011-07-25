@@ -12,6 +12,7 @@ from applications.shared.modules.test_runner import LocalTestSuite, \
 from applications.shared.modules.stickon.validators import IS_CURRENCY, \
         IS_NOT_ALL_EMPTY, NOT_EMPTY_IF_OTHER, NOT_EMPTY_IF_OTHER_BY_ID
 from gluon.shell import env
+import gluon.main               # Sets up logging (if logging in module)
 import sys
 import unittest
 import decimal
@@ -24,10 +25,9 @@ import decimal
 # The test script requires an existing database to work with. The
 # shared database should have tables account and company. The models/db.py
 # should define the tables.
-# Note: When run with python web2py.py, the __file__ value is not what you
-# might expect.  __file__ = applications/shared/models/db.py
-APP_ENV = env(__file__.split('/')[-3], import_models=True)
+APP_ENV = env(__file__.split('/')[-4], import_models=True)
 DBH = APP_ENV['db']
+
 
 class TestIS_CURRENCY(unittest.TestCase):
 
@@ -123,7 +123,7 @@ class TestNOT_EMPTY_IF_OTHER_BY_ID(unittest.TestCase):
         DBH.test.truncate()
 
     @classmethod
-    def tearSetUp(cls):
+    def setUpClass(cls):
         # Create dummy records in test table
         DBH.test.insert(name='Not Other')
         DBH.test.insert(name='Other')

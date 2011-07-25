@@ -10,14 +10,13 @@ Test suite for shared/modules/db/table.py
 # The accounting database is use for testing
 from applications.shared.modules.test_runner import LocalTestSuite, \
     ModuleTestSuite
-from gluon.validators import IS_DATE, IS_DATETIME, IS_INT_IN_RANGE, \
-    IS_IN_DB, IS_IN_SET, IS_LENGTH, IS_NULL_OR
 from applications.shared.modules.database import Collection, DbIOError, \
     DbObject, rows_to_objects
 import cStringIO
 import copy
 import datetime
 import decimal
+import gluon.main               # Sets up logging (if logging in module)
 import re
 import sys
 import time
@@ -103,58 +102,8 @@ class Company(DbObject):
         return
 
 
-def suite_setup():
-
-    # Delete test table if it wasn't removed properly
-
-    rows = DBH.executesql("""SHOW TABLES LIKE 'test';""")
-    if len(rows) > 0:
-        DBH.executesql(TEST_DROP_QUERY)
-        DBH.commit()
-
-    # Create a temporary table for testing
-
-    DBH.executesql(TEST_CREATE_QUERY)
-    DBH.commit()
-
-    DBH.define_table(
-        'test',
-        DBH.Field('company_id', 'integer'),
-        DBH.Field('number', 'integer', requires=IS_INT_IN_RANGE(1000,
-                  10000)),
-        DBH.Field('name', requires=IS_NULL_OR(IS_LENGTH(512))),
-        DBH.Field('amount', 'decimal(10,2)', default=D('0.00')),
-        DBH.Field('start_date', 'date',
-                  requires=IS_NULL_OR(IS_DATE(format='%Y-%m-%d'))),
-        DBH.Field('status', requires=IS_IN_SET(['a', 'd'])),
-        DBH.Field('creation_date', 'datetime',
-                  requires=IS_NULL_OR(IS_DATETIME(format='%Y-%m-%d %H:%M:%S'
-                  ))),
-        DBH.Field('modified_date', 'datetime',
-                  requires=IS_NULL_OR(IS_DATETIME(format='%Y-%m-%d %H:%M:%S'
-                  ))),
-        migrate=False,
-        )
-
-    DBH.test.company_id.requires = IS_IN_DB(DBH, DBH.company.id,
-            '%(name)s')
-    return
-
-
-def suite_teardown():
-
-    # Remove temporary table
-
-    DBH.executesql(TEST_DROP_QUERY)
-    DBH.executesql(TEST_DELETE_COMPANY)
-    DBH.commit()
-    return
-
-
 # The db.test table has to be created in order for it to be used in the Test
 # class definition.
-
-suite_setup()
 
 
 class TestCollection(unittest.TestCase):
@@ -1229,7 +1178,6 @@ def main():
     suite = LocalTestSuite()
     suite.add_tests(ModuleTestSuite(module=sys.modules[__name__]))
     suite.run_tests()
-    suite_teardown()
 
 
 if __name__ == '__main__':

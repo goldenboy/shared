@@ -1,3 +1,4 @@
+import decimal
 
 ModelDb = local_import('stickon/tools', app='shared', reload=DEBUG).ModelDb
 
@@ -221,36 +222,37 @@ status         char        # Test status field
 creation_date  datetime    # Record created timestamp
 modified_date  datetime    # Record last modified timestamp
 """
-db.define_table('test',
+db.define_table( 'test',
     Field('company_id',
-        'integer',
+        'integer'
         ),
     Field('number',
         'integer',
+        requires=IS_INT_IN_RANGE(1000, 10000)
         ),
     Field('name',
-        'text',
+        requires=IS_NULL_OR(IS_LENGTH(512))
         ),
     Field('amount',
-        'decimal(18,2)',
+        'decimal(10,2)',
+        default=decimal.Decimal('0.00')
         ),
     Field('start_date',
         'date',
-        requires=IS_DATE(),
+        requires=IS_NULL_OR(IS_DATE(format='%Y-%m-%d'))
         ),
     Field('status',
-        'boolean',
-        requires=IS_IN_SET([('a', 'Enabled'), ('d', 'Disabled')], zero=None),
+        requires=IS_IN_SET(['a', 'd'])
         ),
     Field('creation_date',
         'datetime',
-        writable=False,
-        requires=IS_DATETIME(),
-        ),
+       requires=IS_NULL_OR(IS_DATETIME(format='%Y-%m-%d %H:%M:%S'))
+       ),
     Field('modified_date',
         'datetime',
-        writable=False,
-        requires=IS_DATETIME(),
+        requires=IS_NULL_OR(IS_DATETIME(format='%Y-%m-%d %H:%M:%S'))
         ),
     )
+
+db.test.company_id.requires = IS_IN_DB(db, db.company.id, '%(name)s')
 
