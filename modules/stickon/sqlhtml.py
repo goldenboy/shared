@@ -21,7 +21,6 @@ class AutoCompleteWidget(object):
     Changes:
         distinct: Passed as a parameter in the select call when retrieving
             records for autocomplete.
-        onblur_delay: integer, delay in ms before onblur fadeout
         fadeout_duration: integer, jQuery fadeOut duration in ms
         filter_field: gluon.dal.Field, eg db.table.field, autocomplete values
             will be filtered on this field
@@ -32,7 +31,7 @@ class AutoCompleteWidget(object):
     def __init__(self, request, field, id_field=None, db=None,
                  orderby=None, limitby=(0,10),
                  keyword='_autocomplete_%(fieldname)s',
-                 min_length=2, distinct=False, onblur_delay=3000,
+                 min_length=2, distinct=False,
                  fadeout_duration=600,
                  filter_field=None, filter_input_id='',
                  ):
@@ -43,7 +42,6 @@ class AutoCompleteWidget(object):
         self.limitby = limitby
         self.min_length = min_length
         self.distinct = distinct
-        self.onblur_delay = onblur_delay
         self.fadeout_duration = fadeout_duration
         self.filter_field = filter_field
         self.filter_input_id = filter_input_id
@@ -109,13 +107,11 @@ class AutoCompleteWidget(object):
             value = attr['value']
             record = self.db(self.fields[1]==value).select(self.fields[0]).first()
             attr['value'] = record and record[self.fields[0].name]
-            attr['_onblur']="jQuery('#%(div_id)s').delay(%(delay)s).fadeOut(%(dur)s);" % \
-                dict(div_id=div_id,u='F'+self.keyword, delay=self.onblur_delay,
-                        dur=self.fadeout_duration)
-            attr['_onkeyup'] = "jQuery('#%(key3)s').val('');var e=event.which?event.which:event.keyCode; function %(u)s(){jQuery('#%(id)s').val(jQuery('#%(key)s :selected').text());jQuery('#%(key3)s').val(jQuery('#%(key)s').val())}; if(e==39) %(u)s(); else if(e==40) {if(jQuery('#%(key)s option:selected').next().length)jQuery('#%(key)s option:selected').attr('selected',null).next().attr('selected','selected'); %(u)s();} else if(e==38) {if(jQuery('#%(key)s option:selected').prev().length)jQuery('#%(key)s option:selected').attr('selected',null).prev().attr('selected','selected'); %(u)s();} else if(jQuery('#%(id)s').val().length>=%(min_length)s) jQuery.get('%(url)s?%(key)s='+escape(jQuery('#%(id)s').val()),function(data){if(data=='')jQuery('#%(key3)s').val('');else{jQuery('#%(id)s').next('.error').hide();jQuery('#%(div_id)s').html(data).show().focus();jQuery('#%(div_id)s select').css('width',jQuery('#%(id)s').css('width'));jQuery('#%(key3)s').val(jQuery('#%(key)s').val());jQuery('#%(key)s').change(%(u)s);jQuery('#%(key)s').click(%(u)s);};}); else jQuery('#%(div_id)s').fadeOut('slow');" % \
+            attr['_onkeyup'] = "jQuery('#%(key3)s').val('');var e=event.which?event.which:event.keyCode; function %(u)s(){jQuery('#%(id)s').val(jQuery('#%(key)s :selected').text());jQuery('#%(key3)s').val(jQuery('#%(key)s').val())}; if(e==39) %(u)s(); else if(e==40) {if(jQuery('#%(key)s option:selected').next().length)jQuery('#%(key)s option:selected').attr('selected',null).next().attr('selected','selected'); %(u)s();} else if(e==38) {if(jQuery('#%(key)s option:selected').prev().length)jQuery('#%(key)s option:selected').attr('selected',null).prev().attr('selected','selected'); %(u)s();} else if(jQuery('#%(id)s').val().length>=%(min_length)s) jQuery.get('%(url)s?%(key)s='+escape(jQuery('#%(id)s').val()),function(data){if(data=='')jQuery('#%(key3)s').val('');else{jQuery('#%(id)s').next('.error').hide();jQuery('#%(div_id)s').html(data).show().focus();jQuery(document).bind('focusin.%(div_id)s click.%(div_id)s',function(e){if(jQuery(e.target).is('#%(key)s option') || (!jQuery(e.target).closest('##%(id)s,#%(div_id)s').length)){jQuery(document).unbind('.%(div_id)s'); jQuery('#%(div_id)s').fadeOut(%(dur)s)}}); jQuery('#%(div_id)s select').css('width',jQuery('#%(id)s').css('width'));jQuery('#%(key3)s').val(jQuery('#%(key)s').val());jQuery('#%(key)s').change(%(u)s);jQuery('#%(key)s').click(%(u)s);};}); else jQuery('#%(div_id)s').fadeOut('slow');" % \
                 dict(url=self.url,min_length=self.min_length,
                      key=self.keyword,id=attr['_id'],key2=key2,key3=key3,
-                     name=name,div_id=div_id,u='F'+self.keyword)
+                     name=name,div_id=div_id,u='F'+self.keyword,
+                     dur=self.fadeout_duration)
             if self.min_length==0:
                 attr['_onfocus'] = attr['_onkeyup']
             return TAG[''](INPUT(**attr),INPUT(_type='hidden',_id=key3,_value=value,
@@ -123,9 +119,6 @@ class AutoCompleteWidget(object):
                                DIV(_id=div_id,_style='position:absolute; z-index: 99'))
         else:
             attr['_name']=field.name
-            attr['_onblur']="jQuery('#%(div_id)s').delay(%(delay)s).fadeOut(%(dur)s);" % \
-                dict(div_id=div_id,u='F'+self.keyword, delay=self.onblur_delay,
-                        dur=self.fadeout_duration)
             filter_str = ''
             if self.filter_keyword and self.filter_input_id:
                 filter_str = "+'&%(filter_key)s='+escape(jQuery('#%(filter_id)s').val())" % \
@@ -134,11 +127,11 @@ class AutoCompleteWidget(object):
                          filter_key=self.filter_keyword,
                          filter_id=self.filter_input_id,
                          )
-            attr['_onkeyup'] = "var e=event.which?event.which:event.keyCode; function %(u)s(){jQuery('#%(id)s').val(jQuery('#%(key)s').val())}; if(e==39) %(u)s(); else if(e==40) {if(jQuery('#%(key)s option:selected').next().length)jQuery('#%(key)s option:selected').attr('selected',null).next().attr('selected','selected'); %(u)s();} else if(e==38) {if(jQuery('#%(key)s option:selected').prev().length)jQuery('#%(key)s option:selected').attr('selected',null).prev().attr('selected','selected'); %(u)s();} else if(jQuery('#%(id)s').val().length>=%(min_length)s) jQuery.get('%(url)s?%(key)s='+escape(jQuery('#%(id)s').val())%(filter_str)s,function(data){jQuery('#%(id)s').next('.error').hide();jQuery('#%(div_id)s').html(data).show().focus();jQuery('#%(div_id)s select').css('width',jQuery('#%(id)s').css('width'));jQuery('#%(key)s').change(%(u)s);jQuery('#%(key)s').click(%(u)s);}); else jQuery('#%(div_id)s').fadeOut('slow');" % \
+            attr['_onkeyup'] = "var e=event.which?event.which:event.keyCode; function %(u)s(){jQuery('#%(id)s').val(jQuery('#%(key)s').val())}; if(e==39) %(u)s(); else if(e==40) {if(jQuery('#%(key)s option:selected').next().length)jQuery('#%(key)s option:selected').attr('selected',null).next().attr('selected','selected'); %(u)s();} else if(e==38) {if(jQuery('#%(key)s option:selected').prev().length)jQuery('#%(key)s option:selected').attr('selected',null).prev().attr('selected','selected'); %(u)s();} else if(jQuery('#%(id)s').val().length>=%(min_length)s) jQuery.get('%(url)s?%(key)s='+escape(jQuery('#%(id)s').val())%(filter_str)s,function(data){jQuery('#%(id)s').next('.error').hide();jQuery('#%(div_id)s').html(data).show().focus(); jQuery(document).bind('focusin.%(div_id)s click.%(div_id)s',function(e){if(jQuery(e.target).is('#%(key)s option') || (!jQuery(e.target).closest('##%(id)s,#%(div_id)s').length)){jQuery(document).unbind('.%(div_id)s'); jQuery('#%(div_id)s').fadeOut(%(dur)s)}}); jQuery('#%(div_id)s select').css('width',jQuery('#%(id)s').css('width'));jQuery('#%(key)s').change(%(u)s);jQuery('#%(key)s').click(%(u)s);}); else jQuery('#%(div_id)s').fadeOut('slow');" % \
                 dict(url=self.url,min_length=self.min_length,
                      key=self.keyword,id=attr['_id'],div_id=div_id,u='F'+self.keyword,
-                     filter_str=filter_str
-                     )
+                     filter_str=filter_str,
+                     dur=self.fadeout_duration)
             if self.min_length==0:
                 attr['_onfocus'] = attr['_onkeyup']
             return TAG[''](INPUT(**attr),DIV(_id=div_id,
