@@ -319,6 +319,14 @@ class ModuleTestSuite(object):
         return
 
 
+def has_terminal():
+    """Return True if the script is run in a terminal environment"""
+
+    if 'PS1' in os.environ:
+        return True
+    return False
+
+
 def _mock_date(self, today_value=None):
     """Function used to override the datetime.date function in tests."""
     # pylint: disable=W0613
