@@ -15,7 +15,9 @@ For usage and help:
 # pylint: disable=W0404
 from applications.shared.modules.mysql_schema import ColumnLine, CreateLine, \
         MySQLColumn, MySQLTable, SchemaFile
+from applications.shared.modules.stickon.tools import ModelDb
 from applications.shared.modules.web2py_sql import FieldPropertyDefaultsSet
+from gluon.shell import env
 from optparse import OptionParser
 import gluon.main               # Sets up logging
 import logging
@@ -329,6 +331,9 @@ def main():
     parser.add_option('-i', '--include-headers', action='store_true',
                     dest='headers',
                     help='Print table documentation headers.')
+    parser.add_option('-s', '--ignore-signature', action='store_true',
+                    dest='ignore_signature',
+                    help='Do not print signature fields.')
     parser.add_option('-v', '--verbose', action='store_true',
                     dest='verbose',
                     help='Print messages to stdout',
@@ -353,6 +358,13 @@ def main():
     if len(args) == 0:
         parser.print_help()
         exit(1)
+
+    ignore_columns = []
+    if options.ignore_signature:
+        APP_ENV = env('shared', import_models=True)
+        for field in ModelDb(APP_ENV).auth.signature.fields:
+            if not field == 'id':
+                ignore_columns.append(field)
 
     f = None
     if args[0] == '-':
@@ -389,7 +401,8 @@ def main():
                 table=tables[-1],
                 attributes=column_line.attributes,
                 )
-            tables[-1].columns.append(column)
+            if column.name not in ignore_columns:
+                tables[-1].columns.append(column)
     f.close()
 
     # Set tables references

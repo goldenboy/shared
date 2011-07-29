@@ -8,6 +8,7 @@ Classes extending functionality of gluon/tools.py.
 
 """
 from applications.shared.modules.mysql import LocalMySQL
+from gluon.dal import Field
 from gluon.storage import Settings
 from gluon.tools import Auth, Crud, Mail, Service
 import logging
@@ -76,6 +77,13 @@ class ModelDb(object):
         auth.messages.reset_password = 'Click on the link http://' + host \
             + '/' + request.application \
             + '/default/user/reset_password/%(key)s to reset your password'
+        auth.signature = self.db.Table(self.db, 'auth_signature',
+                              Field('created_on', 'datetime',
+                                    default=request.now,
+                                    writable=False, readable=False),
+                              Field('updated_on', 'datetime',
+                                    default=request.now, update=request.now,
+                                    writable=False, readable=False))
         return auth
 
     def _crud(self):
