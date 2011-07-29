@@ -46,6 +46,11 @@ class ModelDb(object):
 
         # The order of these is intentional. Some depend on each other.
         self.db = self._db()
+        if self.local_settings.db_sessions == 'db':
+            self.environment['session'].connect(
+                    self.environment['request'],
+                    self.environment['response'],
+                    self.db)
         self.mail = self._mail()
         self.auth = self._auth()
         self.crud = self._crud()
