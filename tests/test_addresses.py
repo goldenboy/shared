@@ -186,19 +186,19 @@ class TestFunctions(unittest.TestCase):
                     'city': 'Troy',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B9A 3T5',
+                    'postal_code': 'B9A3T5',
                     }),
             ('', '', 'b9a3t5', {
                     'city': 'Troy',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B9A 3T5',
+                    'postal_code': 'B9A3T5',
                     }),
             ('Capstick', '', '', {
                     'city': 'Capstick',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B0C 1E0',
+                    'postal_code': 'B0C1E0',
                     }),
             ('Halifax', '', '', {
                     'city': 'Halifax',
@@ -222,7 +222,7 @@ class TestFunctions(unittest.TestCase):
                     'city': 'Troy',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B9A 3T5',
+                    'postal_code': 'B9A3T5',
                     }),
             ('_fake_city_', '_fake_prov_', '_fake_pc_', {
                     'city': '_fake_city_',
