@@ -25,16 +25,26 @@ class AutoCompleteWidget(object):
         filter_field: gluon.dal.Field, eg db.table.field, autocomplete values
             will be filtered on this field
         filter_input_id: string, css id of input containing filter field value.
+        filter_left: the left join required to reference the table using the
+            filter_field. Eg db.table2.on(db.table1.table2_id==db.table2.id)
         Add z-index to style of DIV
     """
 
-    def __init__(self, request, field, id_field=None, db=None,
-                 orderby=None, limitby=(0,10),
-                 keyword='_autocomplete_%(fieldname)s',
-                 min_length=2, distinct=False,
-                 fadeout_duration=600,
-                 filter_field=None, filter_input_id='',
-                 ):
+    def __init__(self,
+            request,
+            field,
+            id_field=None,
+            db=None,
+            orderby=None,
+            limitby=(0,10),
+            keyword='_autocomplete_%(fieldname)s',
+            min_length=2,
+            distinct=False,
+            fadeout_duration=600,
+            filter_field=None,
+            filter_input_id='',
+            filter_left=None,
+            ):
         self.request = request
         self.keyword = keyword % dict(fieldname=field.name)
         self.db = db or field._db
@@ -45,6 +55,7 @@ class AutoCompleteWidget(object):
         self.fadeout_duration = fadeout_duration
         self.filter_field = filter_field
         self.filter_input_id = filter_input_id
+        self.filter_left = filter_left
         self.filter_keyword = ''
         if self.filter_field:
             self.filter_keyword = '_filter_autocomplete_%(fieldname)s' % \
@@ -70,8 +81,8 @@ class AutoCompleteWidget(object):
             if self.filter_keyword in self.request.vars and self.request.vars[self.filter_keyword]:
                 query = query & (self.filter_field == self.request.vars[self.filter_keyword])
             rows = self.db(query)\
-                .select(orderby=self.orderby,limitby=self.limitby,
-                distinct=self.distinct, *self.fields)
+                .select(orderby=self.orderby, limitby=self.limitby,
+                left=self.filter_left, distinct=self.distinct, *self.fields)
             if rows:
                 if self.is_reference:
                     id_field = self.fields[1]

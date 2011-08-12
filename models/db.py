@@ -10,6 +10,8 @@ service = model_db.service
 mail = model_db.mail
 local_settings = model_db.local_settings
 
+db._common_fields=[auth.signature]
+
 #########################################################################
 ## Define your tables below, for example
 ##
@@ -38,8 +40,6 @@ parent_account_id   integer     Account this account is a subgroup of. Reference
 posting             boolean     0=non-posting, 1=posting
 zero_balance        boolean     0=no, 1=yes. Account regularly balances to zero. Eg credit card, ledger transfer, HST payable.
 status              text        Status of this status. 'a' = active, 'd'=deactive.
-creation_date:      datetime    Record creation timestamp.
-modified_date:      datetime    Record last modified timestamp.
 """
 db.define_table('account',
     Field('company_id', 'integer'),
@@ -58,11 +58,21 @@ db.define_table('account',
         default='a',
         requires=IS_IN_SET(['a', 'd'])
         ),
-    Field('creation_date', 'datetime',
-        requires=IS_NULL_OR(IS_DATETIME(format=T('%Y-%m-%d %H:%M:%S'))),
+    )
+
+"""
+city
+
+name         varchar     # FIXME
+province_id  int         # FIXME
+"""
+db.define_table('city',
+    Field('name',
+        'string',
+        requires=IS_NOT_EMPTY(),
         ),
-    Field('modified_date', 'datetime',
-        requires=IS_NULL_OR(IS_DATETIME(format=T('%Y-%m-%d %H:%M:%S'))),
+    Field('province_id',
+        'integer',
         ),
     )
 
@@ -81,8 +91,6 @@ dfa_account_id          integer     Depreciable Fixed Assets account id.  Refere
 colour                  text        What colour to use to identify this company.
 fiscal_month            integer     What month is the year end for this company.
 freeze_date             date        Records before freeze_date are read only.
-creation_date:          datetime    Record creation timestamp.
-modified_date:          datetime    Record last modified timestamp.
         requires=IS_NULL_OR(IS_DATE(format=T('%Y-%m-%d')))
 """
 db.define_table('company',
@@ -109,11 +117,22 @@ db.define_table('company',
     Field('freeze_date', 'date',
         requires=IS_NULL_OR(IS_DATE())
         ),
-    Field('creation_date', 'datetime',
-        requires=IS_NULL_OR(IS_DATETIME(format=T('%Y-%m-%d %H:%M:%S'))),
+    )
+
+"""
+country
+
+name        varchar     # name of country
+code        varchar     # country code
+"""
+db.define_table('country',
+    Field('name',
+        'string',
+        requires=IS_NOT_EMPTY(),
         ),
-    Field('modified_date', 'datetime',
-        requires=IS_NULL_OR(IS_DATETIME(format=T('%Y-%m-%d %H:%M:%S'))),
+    Field('code',
+        'string',
+        requires=IS_NOT_EMPTY(),
         ),
     )
 
@@ -126,8 +145,6 @@ command     varchar     # Command to execute.
 status      char        # 'a' = active (queued),
                         # 'r' = running (in progress),
                         # 'd' = deactive (done)
-created_on  datetime    # FIXME
-updated_on  datetime    # FIXME
 """
 db.define_table('job',
     Field('start',
@@ -146,15 +163,50 @@ db.define_table('job',
         requires=IS_IN_SET([('a', 'Enabled'), ('r', 'In Progress'),
             ('d', 'Disabled')], zero=None),
         ),
-    Field('created_on',
-        'datetime',
-        writable=False,
-        requires=IS_DATETIME(),
+    )
+
+"""
+postal_code
+
+name        varchar     # FIXME
+city_id     int         # FIXME
+latitude    decimal     # FIXME
+longitude   decimal     # FIXME
+"""
+db.define_table('postal_code',
+    Field('name',
+        'string',
+        requires=IS_NOT_EMPTY(),
         ),
-    Field('updated_on',
-        'datetime',
-        writable=False,
-        requires=IS_DATETIME(),
+    Field('city_id',
+        'integer',
+        ),
+    Field('latitude',
+        'decimal(10,6)',
+        ),
+    Field('longitude',
+        'decimal(10,6)',
+        ),
+    )
+
+"""
+province
+
+name        varchar     # FIXME
+code        varchar     # FIXME
+country_id  int         # FIXME
+"""
+db.define_table('province',
+    Field('name',
+        'string',
+        requires=IS_NOT_EMPTY(),
+        ),
+    Field('code',
+        'string',
+        requires=IS_NOT_EMPTY(),
+        ),
+    Field('country_id',
+        'integer',
         ),
     )
 
@@ -219,8 +271,6 @@ name           text        # Test name field
 amount         decimal     # Test amount field
 start_date     date        # Test start_date field
 status         char        # Test status field
-creation_date  datetime    # Record created timestamp
-modified_date  datetime    # Record last modified timestamp
 """
 db.define_table( 'test',
     Field('company_id',
@@ -243,14 +293,6 @@ db.define_table( 'test',
         ),
     Field('status',
         requires=IS_IN_SET(['a', 'd'])
-        ),
-    Field('creation_date',
-        'datetime',
-       requires=IS_NULL_OR(IS_DATETIME(format='%Y-%m-%d %H:%M:%S'))
-       ),
-    Field('modified_date',
-        'datetime',
-        requires=IS_NULL_OR(IS_DATETIME(format='%Y-%m-%d %H:%M:%S'))
         ),
     )
 

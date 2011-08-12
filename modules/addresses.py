@@ -126,3 +126,86 @@ def best_guess_code(value):
     if re.compile(r'[A-Z][0-9][A-Z][0-9][A-Z][0-9]'):
             return CanadianPostalCode(value)
     return PostalCode(value)
+
+
+def best_guess_address(db, city, province, postal_code):
+    """Given some address values, return formalized address values.
+
+    Given postal_code    determine city, province, country if possible
+    Given city           determine province, postal_code, country if possible
+    Given city, province determine province, postal_code, country
+    Given province       determine country
+
+    Args:
+        db: gluon.dal.DAL instance
+        city: string, city name
+        province: string, province value, eg 'ON', 'Ontario', optional
+        postal_code: string, unformatted postal code, optional
+
+    Returns:
+        dict: {
+            'city': 'formal city',
+            'province': 'formal province',
+            'country': 'formal country',
+            'postal_code': 'formal postal_code',
+            }
+    """
+    address = {
+            'city': '',
+            'province': '',
+            'country': '',
+            'postal_code': '',
+            }
+
+    def db_address(address, query):
+        rows = db(query).select(
+                db.postal_code.name,
+                db.city.name,
+                db.province.name,
+                db.country.name,
+                left=[db.city.on(db.postal_code.city_id == db.city.id),
+                    db.province.on(db.city.province_id == db.province.id),
+                    db.country.on(db.province.country_id == db.country.id)]
+                )
+        address_lists = {
+            'city': [],
+            'province': [],
+            'country': [],
+            'postal_code': [],
+            }
+        for r in rows:
+            for k in address_lists.keys():
+                if r[k]['name'] not in address_lists[k]:
+                    address_lists[k].append(r[k]['name'])
+        for k in address_lists.keys():
+            if len(address_lists[k]) == 1:
+                    address[k] = address_lists[k][0]
+        return address
+
+    if postal_code:
+        pc = str(best_guess_code(postal_code))
+        codes = db(db.postal_code.name == pc).select()
+        if len(codes) == 1:
+            address = db_address(address, db.postal_code.id == codes[0].id)
+
+    if city:
+        cities = db(db.city.name == city).select()
+        if len(cities) == 1:
+            address = db_address(address, db.city.id == cities[0].id)
+
+    address['postal_code'] = address['postal_code'] or postal_code
+    address['city'] = address['city'] or city
+    if province:
+        query = (db.province.name == province) | \
+                (db.province.code == province)
+        provinces = db(query).select()
+        if len(provinces) == 1:
+            address['province'] = provinces[0].name
+            try:
+                q = db.country.id == provinces[0].country_id
+                address['country'] = db(q).select()[0].name
+            except:
+                pass
+
+    address['province'] = address['province'] or province
+    return address

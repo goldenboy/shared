@@ -10,13 +10,21 @@ Test suite for shared/modules/postal_code.py
 
 from applications.shared.modules.test_runner import LocalTestSuite, \
         ModuleTestSuite
-from applications.shared.modules.postal_code import CanadianPostalCode, \
-        PostalCode, USAZipCode, best_guess_code
+from applications.shared.modules.addresses import CanadianPostalCode, \
+        PostalCode, USAZipCode, best_guess_code, best_guess_address
 import sys
 import unittest
+import gluon.main
+from gluon.shell import env
+
 
 # pylint: disable=C0111,R0904
 
+# The test script requires an existing database to work with. The
+# shared database should have tables city, province, country and postal_code.
+# The models/db.py should define the tables.
+APP_ENV = env(__file__.split('/')[-3], import_models=True)
+DBH = APP_ENV['db']
 
 class TestPostalCode(unittest.TestCase):
 
@@ -168,6 +176,64 @@ class TestFunctions(unittest.TestCase):
             postal_code = best_guess_code(t[0])
             self.assertTrue(isinstance(postal_code, t[1]))
 
+    def test_best_guess_address(self):
+        # These tests assume city, province and postal_code have Canadian
+        # data.
+
+        # (city, province, postal_code)
+        tests = [
+            ('', '', 'B9A 3T5', {
+                    'city': 'Troy',
+                    'province': 'Nova Scotia',
+                    'country': 'Canada',
+                    'postal_code': 'B9A 3T5',
+                    }),
+            ('', '', 'b9a3t5', {
+                    'city': 'Troy',
+                    'province': 'Nova Scotia',
+                    'country': 'Canada',
+                    'postal_code': 'B9A 3T5',
+                    }),
+            ('Capstick', '', '', {
+                    'city': 'Capstick',
+                    'province': 'Nova Scotia',
+                    'country': 'Canada',
+                    'postal_code': 'B0C 1E0',
+                    }),
+            ('Halifax', '', '', {
+                    'city': 'Halifax',
+                    'province': 'Nova Scotia',
+                    'country': 'Canada',
+                    'postal_code': '',
+                    }),
+            ('', 'ON', '', {
+                    'city': '',
+                    'province': 'Ontario',
+                    'country': 'Canada',
+                    'postal_code': '',
+                    }),
+            ('', 'Ontario', '', {
+                    'city': '',
+                    'province': 'Ontario',
+                    'country': 'Canada',
+                    'postal_code': '',
+                    }),
+            ('_fake_city_', '', 'B9A 3T5', {
+                    'city': 'Troy',
+                    'province': 'Nova Scotia',
+                    'country': 'Canada',
+                    'postal_code': 'B9A 3T5',
+                    }),
+            ('_fake_city_', '_fake_prov_', '_fake_pc_', {
+                    'city': '_fake_city_',
+                    'province': '_fake_prov_',
+                    'country': '',
+                    'postal_code': '_fake_pc_',
+                    }),
+            ]
+
+        for t in tests:
+            self.assertEqual(best_guess_address(DBH, t[0], t[1], t[2]), t[3])
 
 def main():
     suite = LocalTestSuite()

@@ -51,8 +51,8 @@ CREATE TABLE test (
   amount decimal(18,2) DEFAULT '0.00',
   start_date date DEFAULT NULL,
   status char(1) DEFAULT 'a',
-  creation_date datetime DEFAULT NULL,
-  modified_date datetime DEFAULT NULL,
+  created_on datetime DEFAULT NULL,
+  updated_on datetime DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1
 """
@@ -279,8 +279,8 @@ class TestCollection(unittest.TestCase):
             AMOUNT,
             START_DATE,
             STATUS,
-            t.creation_date,
-            t.modified_date,
+            t.created_on,
+            t.updated_on,
             t2.id,
             COMPANY_ID,
             NUMBER_2,
@@ -288,8 +288,8 @@ class TestCollection(unittest.TestCase):
             AMOUNT_2,
             START_DATE_2,
             STATUS_2,
-            t2.creation_date,
-            t2.modified_date,
+            t2.created_on,
+            t2.updated_on,
             ), output.getvalue())
         output.close()
 
@@ -315,8 +315,8 @@ class TestCollection(unittest.TestCase):
             'amount',
             'start_date',
             'status',
-            'creation_date',
-            'modified_date',
+            'created_on',
+            'updated_on',
             t.id,
             COMPANY_ID,
             NUMBER,
@@ -324,8 +324,8 @@ class TestCollection(unittest.TestCase):
             AMOUNT,
             START_DATE,
             STATUS,
-            t.creation_date,
-            t.modified_date,
+            t.created_on,
+            t.updated_on,
             ), output.getvalue())
         output.close()
 
@@ -708,7 +708,10 @@ class TestDbObject(unittest.TestCase):
 
     def test__as_dict(self):
         t = DbObject(DBH.test)
-        self.assertEqual(t.as_dict(), {
+        as_d = t.as_dict()
+        del as_d['created_on']
+        del as_d['updated_on']
+        self.assertEqual(as_d, {
             'id': None,
             'company_id': None,
             'number': None,
@@ -716,8 +719,6 @@ class TestDbObject(unittest.TestCase):
             'amount': D('0.00'),
             'start_date': None,
             'status': None,
-            'creation_date': None,
-            'modified_date': None,
             })
         t.company_id = COMPANY_ID
         t.number = NUMBER
@@ -725,7 +726,10 @@ class TestDbObject(unittest.TestCase):
         t.amount = AMOUNT
         t.start_date = START_DATE
         t.status = STATUS
-        self.assertEqual(t.as_dict(), {
+        as_d = t.as_dict()
+        del as_d['created_on']
+        del as_d['updated_on']
+        self.assertEqual(as_d, {
             'id': None,
             'company_id': COMPANY_ID,
             'number': NUMBER,
@@ -733,8 +737,6 @@ class TestDbObject(unittest.TestCase):
             'amount': AMOUNT,
             'start_date': START_DATE,
             'status': STATUS,
-            'creation_date': None,
-            'modified_date': None,
             })
         return
 
@@ -742,14 +744,12 @@ class TestDbObject(unittest.TestCase):
         t = DbObject(DBH.test)
 
         # Uninitialized returns list of default values
-        self.assertEqual(t.as_list(), [
+        self.assertEqual(t.as_list()[:7], [
             None,
             None,
             None,
             None,
             D('0.00'),
-            None,
-            None,
             None,
             None,
             ])
@@ -761,7 +761,7 @@ class TestDbObject(unittest.TestCase):
         t.start_date = START_DATE
         t.status = STATUS
         # Initialized returns expected list
-        self.assertEqual(t.as_list(), [
+        self.assertEqual(t.as_list()[:7], [
             None,
             COMPANY_ID,
             NUMBER,
@@ -769,8 +769,6 @@ class TestDbObject(unittest.TestCase):
             AMOUNT,
             START_DATE,
             STATUS,
-            None,
-            None,
             ])
         return
 
@@ -789,8 +787,8 @@ class TestDbObject(unittest.TestCase):
         self.assertTrue(t.add())  # Add succeeds
         self.assertTrue(self.i_re.match(str(t.id)))  # Object id field is set
         # Creation and modified dates should be set.
-        self.assertTrue(isinstance(t.creation_date, datetime.datetime))
-        self.assertTrue(isinstance(t.modified_date, datetime.datetime))
+        self.assertTrue(isinstance(t.created_on, datetime.datetime))
+        self.assertTrue(isinstance(t.updated_on, datetime.datetime))
 
         rows = \
             t.db_.executesql("""
@@ -802,8 +800,8 @@ class TestDbObject(unittest.TestCase):
                 amount,
                 start_date,
                 status,
-                creation_date,
-                modified_date
+                created_on,
+                updated_on
             FROM test;
             """)
         self.assertEqual(rows[0][0], t.id)  # Id matches
@@ -839,8 +837,8 @@ class TestDbObject(unittest.TestCase):
                 amount,
                 start_date,
                 status,
-                creation_date,
-                modified_date
+                created_on,
+                updated_on
             FROM test;
             """)
         self.assertEqual(rows[0][0], t2.id)  # Id matches
@@ -878,8 +876,8 @@ class TestDbObject(unittest.TestCase):
             AMOUNT,
             START_DATE,
             STATUS,
-            t.creation_date,
-            t.modified_date,
+            t.created_on,
+            t.updated_on,
             ), output.getvalue())
 
         t.tbl_.truncate()
@@ -899,7 +897,7 @@ class TestDbObject(unittest.TestCase):
         t.status = STATUS
         self.assertTrue(t.add())  # Add succeeds
 
-        original_modified_date = t.modified_date
+        original_updated_on = t.updated_on
 
         t.name = NAME_2
         time.sleep(1)  # Pause one sec so the modified date will change
@@ -914,8 +912,8 @@ class TestDbObject(unittest.TestCase):
                 number,
                 start_date,
                 status,
-                creation_date,
-                modified_date
+                created_on,
+                updated_on
             FROM test;
             """)
         self.assertEqual(rows[0][0], t.id)  # Id matches
@@ -929,7 +927,7 @@ class TestDbObject(unittest.TestCase):
         self.assertTrue(isinstance(rows[0][7], datetime.datetime))
 
         # modified date is updated
-        self.assertNotEqual(t.modified_date, original_modified_date)
+        self.assertNotEqual(t.updated_on, original_updated_on)
 
         t.tbl_.truncate()
         t.db_.commit()
