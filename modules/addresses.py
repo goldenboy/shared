@@ -183,7 +183,7 @@ def best_guess_address(db, city, province, postal_code):
         return address
 
     if postal_code:
-        pc = best_guess_code(postal_code).format_storage()
+        pc = best_guess_code(postal_code).format_display()
         codes = db(db.postal_code.name == pc).select()
         if len(codes) == 1:
             address = db_address(address, db.postal_code.id == codes[0].id)
@@ -194,7 +194,7 @@ def best_guess_address(db, city, province, postal_code):
             address = db_address(address, db.city.id == cities[0].id)
 
     address['postal_code'] = best_guess_code(
-            address['postal_code'] or postal_code).format_storage()
+            address['postal_code'] or postal_code).display()
     address['city'] = address['city'] or city
     if province:
         query = (db.province.name == province) | \
