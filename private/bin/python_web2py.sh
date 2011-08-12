@@ -43,7 +43,7 @@ __v && __mi "Starting:"
 
 # Extract the app.
 unset app
-tmp_script=${script#*/}         # Strip 'applicaitons/'
+tmp_script=${script#*/}         # Strip 'applications/'
 app=${tmp_script%%/*}           # Strip 'private/bin/script.py'
 
 python web2py.py --no-banner -L config.py -S "$app" -R "$script" -A ${args[*]}
