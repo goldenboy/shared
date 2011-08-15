@@ -37,7 +37,7 @@ class PostalCode(object):
         Returns:
             string, formatted postal code
         """
-        return self.value
+        return self.value or ''
 
     def format_storage(self):
         """Format the postal code suitable for storage.
@@ -50,6 +50,8 @@ class PostalCode(object):
         Returns:
             String, eg 'A1B2C3'
         """
+        if not self.value:
+            return ''
         return re.sub(r'[^0-9A-Z]', '', self.value.upper())
 
 
@@ -76,6 +78,8 @@ class CanadianPostalCode(PostalCode):
             string, formatted postal code
         """
         s = self.format_storage()
+        if not s:
+            return ''
         return '{p1} {p2}'.format(p1=s[:3], p2=s[3:])
 
 
@@ -102,6 +106,8 @@ class USAZipCode(PostalCode):
             string, formatted postal code
         """
         s = self.format_storage()
+        if not s:
+            return ''
         if len(s) <= 5:
             return s
         else:
@@ -118,12 +124,15 @@ def best_guess_code(value):
         * A1A1A1 => CanadianPostalCode
         * everything else => PostalCode
     """
+    if not value:
+        return PostalCode(value)
+
     for_testing = re.sub(r'[^0-9A-Z]', '', value.upper())
 
-    if re.compile(r'\d{5}').match(for_testing) or \
-            re.compile(r'\d{9}').match(for_testing):
+    if re.compile(r'^\d{5}$').match(for_testing) or \
+            re.compile(r'^\d{9}$').match(for_testing):
             return USAZipCode(value)
-    if re.compile(r'[A-Z][0-9][A-Z][0-9][A-Z][0-9]'):
+    if re.compile(r'^[A-Z][0-9][A-Z][0-9][A-Z][0-9]$').match(for_testing):
             return CanadianPostalCode(value)
     return PostalCode(value)
 
@@ -194,7 +203,7 @@ def best_guess_address(db, city, province, postal_code):
             address = db_address(address, db.city.id == cities[0].id)
 
     address['postal_code'] = best_guess_code(
-            address['postal_code'] or postal_code).display()
+            address['postal_code'] or postal_code).format_display()
     address['city'] = address['city'] or city
     if province:
         query = (db.province.name == province) | \

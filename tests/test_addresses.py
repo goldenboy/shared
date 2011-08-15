@@ -46,6 +46,8 @@ class TestPostalCode(unittest.TestCase):
     def test__format_display(self):
         # (value, expect, label)
         tests = [
+            ('', '', 'empty string'),
+            (None, '', 'none'),
             ('A1B 2C3', 'A1B 2C3', 'typical can'),
             ('a1b 2c3', 'a1b 2c3', 'typical can lowercase'),
             ('A1B2C3', 'A1B2C3', 'typical can no space'),
@@ -65,6 +67,8 @@ class TestPostalCode(unittest.TestCase):
     def test__format_storage(self):
         # (value, expect, label)
         tests = [
+            ('', '', 'empty string'),
+            (None, '', 'none'),
             ('A1B 2C3', 'A1B2C3', 'typical can'),
             ('a1b 2c3', 'A1B2C3', 'typical can lowercase'),
             ('A1B2C3', 'A1B2C3', 'typical can no space'),
@@ -101,6 +105,8 @@ class TestCanadianPostalCode(unittest.TestCase):
     def test__format_display(self):
         # (value, expect, label)
         tests = [
+            ('', '', 'empty string'),
+            (None, '', 'none'),
             ('A1B 2C3', 'A1B 2C3', 'typical can'),
             ('a1b 2c3', 'A1B 2C3', 'typical can lowercase'),
             ('A1B2C3', 'A1B 2C3', 'typical can no space'),
@@ -132,6 +138,8 @@ class TestUSAZipCode(unittest.TestCase):
     def test__format_display(self):
         # (value, expect, label)
         tests = [
+            ('', '', 'empty string'),
+            (None, '', 'none'),
             ('12345', '12345', 'atypical 5'),
             ('123456789', '12345-6789', 'atypical 9'),
             ('A1B 2C3', 'A1B2C-3', 'typical can'),
@@ -156,13 +164,14 @@ class TestFunctions(unittest.TestCase):
     def test_best_guess_code(self):
         # (value, expect, label)
         tests = [
+            ('', PostalCode, 'empty string'),
+            (None, PostalCode, 'none'),
             ('A1B 2C3', CanadianPostalCode, 'CAN'),
             ('A1B2C3',  CanadianPostalCode, 'CAN no space'),
             ('a1b 2c3', CanadianPostalCode, 'CAN lowercase'),
             ('12345', USAZipCode, 'USA 5'),
             ('123456789', USAZipCode, 'USA 9'),
             ('12345-6789', USAZipCode, 'USA 9 hyphen'),
-            ('', PostalCode, 'empty string'),
             ('Not available', PostalCode, 'notice'),
             ('!@#!%$!@$#!', PostalCode, 'gibberish'),
             ('1234', PostalCode, 'too few digits'),
@@ -170,11 +179,12 @@ class TestFunctions(unittest.TestCase):
             ('1234567890', PostalCode, 'too many digits'),
             ('A1B 2C', PostalCode, 'Invalid CAN'),
             ('A1B 2C3D', PostalCode, 'Invalid CAN'),
+            ('_fake_pc_', PostalCode, 'fake code'),
             ]
 
         for t in tests:
             postal_code = best_guess_code(t[0])
-            self.assertTrue(isinstance(postal_code, t[1]))
+            self.assertEqual(type(postal_code), t[1])
 
     def test_best_guess_address(self):
         # These tests assume city, province and postal_code have Canadian
@@ -186,19 +196,19 @@ class TestFunctions(unittest.TestCase):
                     'city': 'Troy',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B9A3T5',
+                    'postal_code': 'B9A 3T5',
                     }),
             ('', '', 'b9a3t5', {
                     'city': 'Troy',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B9A3T5',
+                    'postal_code': 'B9A 3T5',
                     }),
             ('Capstick', '', '', {
                     'city': 'Capstick',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B0C1E0',
+                    'postal_code': 'B0C 1E0',
                     }),
             ('Halifax', '', '', {
                     'city': 'Halifax',
@@ -222,7 +232,7 @@ class TestFunctions(unittest.TestCase):
                     'city': 'Troy',
                     'province': 'Nova Scotia',
                     'country': 'Canada',
-                    'postal_code': 'B9A3T5',
+                    'postal_code': 'B9A 3T5',
                     }),
             ('_fake_city_', '_fake_prov_', '_fake_pc_', {
                     'city': '_fake_city_',
